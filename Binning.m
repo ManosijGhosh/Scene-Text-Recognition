@@ -1,4 +1,4 @@
- function [BinImages,NUM_BIN_IMAGES] = Binning( image,BinSizes)
+ function [BinImages,NUM_BIN_IMAGES,MAX_DISTANCE] = Binning( image,BinSizes)
   %reduced = 186;
  
  
