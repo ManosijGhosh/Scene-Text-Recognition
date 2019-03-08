@@ -1,5 +1,22 @@
 function [StableImages] = removeUnstableComponents(BinImages,BinSizes,StabilityCheckMatrix,BinMatrix,hasParametersSupplied,Parameters,StabilityPredictor)
 
+
+ %% Features Extracted: 
+    % 1. Del(No. of Pixels Bin i - Bin i + SubBin(i-1,i+1))/Total No. of Pixels
+    % 2. Del(No. of Pixels Bin i - Bin(i,i+1,i-1))/Total No. of Pixels
+    % 3. No. of Holes                   
+    % 4. Del(No. of Holes Bin i - Bin i + SubBin(i-1,i+1))
+    % 5. Del(No. of Holes Bin i - Bin i + Bin(i-1,i+1))
+    % 6. Density 
+    % 7. Del(Change of Density of Bin i - Bin i + SubBin(i-1,i+1))/Density
+    % 8. Del(Change of Density of Bin i - Bin i + Bin(i,i-1,i+1))/Density
+    % 9. Number of Pixels
+    % 10. BinSize
+    % 11.Lower Range Increment Check  (Eliminate)
+    % 12. Higher Range Increment Check (Eliminate)
+
+    
+    %% CODE
 show_error = false;
 StableImages = false(size(BinImages));
 [row,col,NUM_BIN_IMAGES] = size(BinImages);
@@ -170,7 +187,7 @@ q_offset = 0;
         
 
        if hasParametersSupplied
-        [isStable] = PredictStabilityFromParameters(FeatureValues,Parameters);
+        [isStable] = PredictStabilityFromParameters([FeatureValues(1,[1 2 4 5 7 8 9]) stats(comp).BoundingBox(4) stats(comp).BoundingBox(3) FeatureValues(1,[6 3])],Parameters);
        else
          [isStable] = PredictStabilityFromClassifier(FeatureValues,StabilityPredictor);  
         
@@ -322,7 +339,13 @@ q_offset = 0;
         FeatureValues(1,8) = (abs(upper_check_stats(upper_range_overlap_comp(1,1)).Solidity - stats(comp).Solidity))/ stats(comp).Solidity;
         
 
-        [isStable] = PredictStability(FeatureValues,StabilityPredictor);
+      
+       if hasParametersSupplied
+        [isStable] = PredictStabilityFromParameters([FeatureValues(1,[1 2 4 5 7 8 9]) stats(comp).BoundingBox(4) stats(comp).BoundingBox(3) FeatureValues(1,[6 3])],Parameters);
+       else
+         [isStable] = PredictStabilityFromClassifier(FeatureValues,StabilityPredictor);  
+        
+       end
         
         if isStable
             output_image(CC_scan_img.PixelIdxList{comp}) = true;

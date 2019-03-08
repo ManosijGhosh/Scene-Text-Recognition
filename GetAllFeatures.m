@@ -1,4 +1,4 @@
-function [CCs,CCstats,Features,FinalBinImages] = GetAllFeatures(BinImages,getFinalBinImages) % Make 2nd one false for speed
+function [CCs,CCstats,Features,FinalBinImages] = GetAllFeatures(BinImages,BinSizes,StabilityCheckMatrix,getFinalBinImages) % Make 2nd one false for speed
 
 
 %% Features Extracted
@@ -14,15 +14,17 @@ function [CCs,CCstats,Features,FinalBinImages] = GetAllFeatures(BinImages,getFin
    % 9. Width  (1,Inf)
    % 10. Solidity [0,1]
    % 11. Euler [0,Inf)
+   
    % 12  Eccentricity [0,1]
    % 13. Extent [0,1]
    % 14. SVT [0,1]
    % 15. eHOG [0,1]
 
+   Features = zeros(1,15);
  
 
 %% CODE
- show_error = false;  %% CHANGE TO TRUE TO ERRORS
+ show_error = false;  %% CHANGE TO TRUE TO SHOW ERRORS
 [row,col,NUM_BIN_IMAGES] = size(BinImages);
 
 cc_no = 1;
@@ -34,7 +36,7 @@ cc_no = 1;
      FinalBinImages = zeros(1,1); % NA IF FINAL BIN IMAGES NOT WANTED
  end
  
- Features = zeros(1,12);
+ 
  
  
 q_offset = 0;  
