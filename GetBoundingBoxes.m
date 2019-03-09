@@ -7,17 +7,17 @@ function [BoundingBoxes] = GetBoundingBoxes(CCs,CCstats,Features,NeedToStabilize
     
     %% Features 
 
-   % 1. Lower Range Pixel Deviatiion ([0,Inf])
-   % 2. Higher Range Pixel Deviation ([0,Inf])
-   % 3. Lower Range change of Euler Number([0,Inf))
-   % 4. Higher Range change of Euler Number([0,Inf))
-   % 5. Lower Range Density Deviation ([0,Inf])
-   % 6. Higher Range Density Deviation ([0,Inf])
-   % 7. No. of Pixels [0,Inf)
-   % 8. Height (1,Inf)
-   % 9. Width  (1,Inf)
+   % 1. Lower Range Pixel Deviatiion ([0,1])
+   % 2. Higher Range Pixel Deviation ([0,1])
+   % 3. Lower Range change of Euler Number/100([0,1))
+   % 4. Higher Range change of Euler Number/100([0,1))
+   % 5. Lower Range Density Deviation ([0,1])
+   % 6. Higher Range Density Deviation ([0,1])
+   % 7. No. of Pixels [0,1)
+   % 8. Height (1,1)
+   % 9. Width  (1,1)
    % 10. Solidity [0,1]
-   % 11. Euler [0,Inf)
+   % 11. Euler/100 [0,1)
    
    % 12  Eccentricity [0,1]
    % 13. Extent [0,1]
@@ -29,12 +29,12 @@ function [BoundingBoxes] = GetBoundingBoxes(CCs,CCstats,Features,NeedToStabilize
     % 1.  Max Lower Range No. of Pixels Deviation Allowed ( Value > 0 and Value < 1 )
     % 2.  Max Higher Range No. of Pixels Deviation Allowed ( Value > 0 and Value < 1)
     % 3.  Max Euler Number( Value > 1 and Value < Infinite )                  
-    % 4.  Max Difference in Euler Number for Lower Range( 0 <= Value < Inf )
-    % 5.  Max Difference in Euler Number for Higher Range( 0 <= Value < Inf )
+    % 4.  Max Difference in Euler Number for Lower Range/100( 0 <= Value < 1 )
+    % 5.  Max Difference in Euler Number for Higher Range/100( 0 <= Value < 1 )
     % 6.  Max Solidity ( Value > 0 and Value < 1)
     % 7.  Min Solidity ( Value > 0 and Value < 1)
-    % 8.  Max Lower Range Density Deviation Allowed ( 0 < Value < Inf )
-    % 9.  Max Higher Range Density Deviation Allowed ( 0 < Value < Inf )
+    % 8.  Max Lower Range Density Deviation Allowed ( 0 < Value < 1 )
+    % 9.  Max Higher Range Density Deviation Allowed ( 0 < Value < 1 )
     % 10.  Max No. of Pixels
     % 11. Min No. of Pixels
     % 12. Max Height
@@ -43,15 +43,15 @@ function [BoundingBoxes] = GetBoundingBoxes(CCs,CCstats,Features,NeedToStabilize
     % 15. Min Width
     
     
-    % 16. Baseline Deviation by average height for aligned ( 0 < Value < Inf )
-    % 17. Spacing Deviation by average height for aligned (0 < value < Inf )
+    % 16. Baseline Deviation by average height for aligned ( 0 < Value < 1 )
+    % 17. Spacing Deviation by average height for aligned (0 < value < 1 )
     % 18. Height Difference by average height for aligned ( 0 < Value < 1 )
     % 19. Maximum negative starting point by average height for aligned (0 < Value < 1)
     
     
     % 20. Max Average Solidity for aligned ( 0 < Value < 1)
     % 21. Min Average Solidity for aligned ( 0 < Value < Max Solidity)
-    % 22. Max Average Euler Number for aligned ( 0 < Value < Inf)
+    % 22. Max Average Euler Number for aligned ( 0 < Value < 1)
     % 23. Min Average Euler Number for aligned ( 0 < Value < Max Euler)
     % 24. Max Average Eccentricity for Aligned ( 0 < Value < 1)
     % 25. Min Average Eccentricity for Aligned ( 0 < Value < Max Eccentricity)
@@ -62,7 +62,7 @@ function [BoundingBoxes] = GetBoundingBoxes(CCs,CCstats,Features,NeedToStabilize
     
     % 20. Max Solidity [0,1]
     % 31. Min Solidity [0,Max Solidity]
-    % 32. Max Euler Number [0,Inf)
+    % 32. Max Euler Number [0,1)
     % 33. Min Euler Number [0,Max Euler)
     % 34. Max Eccentricity [0,1]
     % 35. Min Eccentricity [0,Max Eccentricity]
@@ -81,9 +81,9 @@ function [BoundingBoxes] = GetBoundingBoxes(CCs,CCstats,Features,NeedToStabilize
           NonAlignedGroupParams_MIN = [Parameters(1,31:2:37) 0 0];
        else                                     % DEFAULT VALUES
            GroupingParams = [ 0.25 0.25 0.25 0.25 ];
-           AlignedGroupParams_MAX = [ 0.8 6 0.98 0.9 0.25 0.3];
+           AlignedGroupParams_MAX = [ 0.8 0.06 0.98 0.9 0.25 0.3];
            AlignedGroupParams_MIN = [0.1 0 0 0.2 0 0];
-           NonAlignedGroupParams_MAX = [0.65 6 0.99 0.9 0.25 0.3];
+           NonAlignedGroupParams_MAX = [0.65 0.06 0.99 0.9 0.25 0.3];
            NonAlignedGroupParams_MIN = [ 0.1 0 0 0.2 0 0];
        end
        
@@ -107,7 +107,7 @@ function [BoundingBoxes] = GetBoundingBoxes(CCs,CCstats,Features,NeedToStabilize
          
          if NeedToStabilize && component_class(comp,1) == 0
              if hasParametersSupplied
-                 [isStable] = PredictStabilityFromParameters(Features(1,1:11),Parameters(1,1:14));
+                 [isStable] = PredictStabilityFromParameters(Features(1,1:11),Parameters(1,1:15));
              else
                  error("Need to supply Parameters if Unstable components supplied"); 
              end

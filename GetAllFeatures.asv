@@ -5,15 +5,15 @@ function [CCs,CCstats,Features,FinalBinImages] = GetAllFeatures(BinImages,BinSiz
 
    % 1. Lower Range Pixel Deviatiion ([0,Inf])
    % 2. Higher Range Pixel Deviation ([0,Inf])
-   % 3. Lower Range change of Euler Number/100([0,Inf))
-   % 4. Higher Range change of Euler Number/100([0,Inf))
+   % 3. Lower Range change of Euler Number([0,Inf))
+   % 4. Higher Range change of Euler Number([0,Inf))
    % 5. Lower Range Density Deviation ([0,Inf])
    % 6. Higher Range Density Deviation ([0,Inf])
-   % 7. No. of Pixels/MaxPixels [0,Inf)
-   % 8. Height/MaxHeight (1,Inf)
-   % 9. Width/MaxWidth (1,Inf)
+   % 7. No. of Pixels [0,Inf)
+   % 8. Height (1,Inf)
+   % 9. Width  (1,Inf)
    % 10. Solidity [0,1]
-   % 11. Euler/100 [0,Inf)
+   % 11. Euler [0,Inf)
    
    % 12  Eccentricity [0,1]
    % 13. Extent [0,1]
@@ -173,7 +173,7 @@ q_offset = 0;
           
      palate(CC_scan_img.PixelIdxList{comp}) = 1;
                 
-     FeatureValues(1,10:15) = [ stats(comp).Solidity (stats(comp).EulerNumber)/100 stats(comp).Eccentricity stats(comp).Extent SWT(palate) eHOG(palate) ];
+     FeatureValues(1,10:15) = [ stats(comp).Solidity stats(comp).EulerNumber stats(comp).Eccentricity stats(comp).Extent SWT(palate) eHOG(palate) ];
      palate(:,:) = 0;       
                
          
@@ -299,8 +299,8 @@ q_offset = 0;
         
      FeatureValues(1,1) = (abs(numel(lower_range_check_CC.PixelIdxList{lower_range_overlap_comp(1,1)}) - numel(CC_scan_img.PixelIdxList{comp})))/numel(CC_scan_img.PixelIdxList{comp});        
      FeatureValues(1,2) = (abs(numel(upper_range_check_CC.PixelIdxList{upper_range_overlap_comp(1,1)}) - numel(CC_scan_img.PixelIdxList{comp})))/numel(CC_scan_img.PixelIdxList{comp});        
-     FeatureValues(1,3) = (lower_check_stats(lower_range_overlap_comp(1,1)).EulerNumber - stats(comp).EulerNumber)/100;     
-     FeatureValues(1,4) = (upper_check_stats(upper_range_overlap_comp(1,1)).EulerNumber - stats(comp).EulerNumber)/100; 
+     FeatureValues(1,3) = lower_check_stats(lower_range_overlap_comp(1,1)).EulerNumber - stats(comp).EulerNumber;     
+     FeatureValues(1,4) = upper_check_stats(upper_range_overlap_comp(1,1)).EulerNumber - stats(comp).EulerNumber; 
      FeatureValues(1,5) = (abs(lower_check_stats(lower_range_overlap_comp(1,1)).Solidity - stats(comp).Solidity))/ stats(comp).Solidity;
      FeatureValues(1,6) = (abs(upper_check_stats(upper_range_overlap_comp(1,1)).Solidity - stats(comp).Solidity))/ stats(comp).Solidity;
      FeatureValues(1,7) = numel(CC_scan_img.PixelIdxList{comp})/(row*col);    
@@ -309,7 +309,7 @@ q_offset = 0;
           
      palate(CC_scan_img.PixelIdxList{comp}) = 1;
                 
-     FeatureValues(1,10:15) = [ stats(comp).Solidity (stats(comp).EulerNumber)/100 stats(comp).Eccentricity stats(comp).Extent SWT(palate) eHOG(palate) ];
+     FeatureValues(1,10:15) = [ stats(comp).Solidity stats(comp).EulerNumber stats(comp).Eccentricity stats(comp).Extent SWT(palate) eHOG(palate) ];
      palate(:,:) = 0;       
                
          
