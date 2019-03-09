@@ -167,9 +167,9 @@ q_offset = 0;
      FeatureValues(1,4) = upper_check_stats(upper_range_overlap_comp(1,1)).EulerNumber - stats(comp).EulerNumber; 
      FeatureValues(1,5) = (abs(lower_check_stats(lower_range_overlap_comp(1,1)).Solidity - stats(comp).Solidity))/ stats(comp).Solidity;
      FeatureValues(1,6) = (abs(upper_check_stats(upper_range_overlap_comp(1,1)).Solidity - stats(comp).Solidity))/ stats(comp).Solidity;
-     FeatureValues(1,7) = numel(CC_scan_img.PixelIdxList{comp});    
-     FeatureValues(1,8) = stats(comp).BoundingBox(4);
-     FeatureValues(1,9) = stats(comp).BoundingBox(3);
+     FeatureValues(1,7) = numel(CC_scan_img.PixelIdxList{comp})/(row*col);    
+     FeatureValues(1,8) = stats(comp).BoundingBox(4)/row;
+     FeatureValues(1,9) = stats(comp).BoundingBox(3)/col;
           
      palate(CC_scan_img.PixelIdxList{comp}) = 1;
                 
@@ -302,9 +302,9 @@ q_offset = 0;
      FeatureValues(1,4) = upper_check_stats(upper_range_overlap_comp(1,1)).EulerNumber - stats(comp).EulerNumber; 
      FeatureValues(1,5) = (abs(lower_check_stats(lower_range_overlap_comp(1,1)).Solidity - stats(comp).Solidity))/ stats(comp).Solidity;
      FeatureValues(1,6) = (abs(upper_check_stats(upper_range_overlap_comp(1,1)).Solidity - stats(comp).Solidity))/ stats(comp).Solidity;
-     FeatureValues(1,7) = numel(CC_scan_img.PixelIdxList{comp});    
-     FeatureValues(1,8) = stats(comp).BoundingBox(4);
-     FeatureValues(1,9) = stats(comp).BoundingBox(3);
+     FeatureValues(1,7) = numel(CC_scan_img.PixelIdxList{comp})/(row*col);    
+     FeatureValues(1,8) = stats(comp).BoundingBox(4)/row;
+     FeatureValues(1,9) = stats(comp).BoundingBox(3)/col;
           
      palate(CC_scan_img.PixelIdxList{comp}) = 1;
                 
