@@ -1,8 +1,5 @@
-function [BoundingBoxes] = fitness(image,BinSizes,hasParametersSupplied,Parameters,StabilityPredictor)
+function [BoundMatrix] = GetParameterMatrix()
 
-
-   %% PARAMETERS
-    
     % 1.  Max Lower Range No. of Pixels Deviation Allowed ( Value > 0 and Value < 1 )
     % 2.  Max Higher Range No. of Pixels Deviation Allowed ( Value > 0 and Value < 1)
     % 3.  Max Euler Number( Value > 1 and Value < Infinite )                  
@@ -12,12 +9,12 @@ function [BoundingBoxes] = fitness(image,BinSizes,hasParametersSupplied,Paramete
     % 7.  Min Solidity ( Value > 0 and Value < 1)
     % 8.  Max Lower Range Density Deviation Allowed ( 0 < Value < Inf )
     % 9.  Max Higher Range Density Deviation Allowed ( 0 < Value < Inf )
-    % 10.  Max No. of Pixels
-    % 11. Min No. of Pixels
-    % 12. Max Height
-    % 13. Min Height
-    % 14. Max Width
-    % 15. Min Width
+    % 10.  Max No. of Pixels/TotalPixels
+    % 11. Min No. of Pixels/TotalPixels
+    % 12. Max Height/ImageHeight
+    % 13. Min Height/ImageHeight
+    % 14. Max Width/ImageWidth
+    % 15. Min Width/ImageWidth
     
     
     % 16. Baseline Deviation by average height for aligned ( 0 < Value < Inf )
@@ -48,36 +45,7 @@ function [BoundingBoxes] = fitness(image,BinSizes,hasParametersSupplied,Paramete
     % 38. Max SVT [0,1]
     % 39. Max eHOG [0,1]
     
+    BoundMatrix = [zeros(1,39);1 1 100 100 100 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 100 100 1 1 1 1 1 1 1 1 100 100 1 1 1 1 1 1];   
     
-    %FEATURE VECTOR = [ SOLIDITY EULER ECCENTRICITY EXTENT SVT eHOG]
-  
-   
-    %% BINNING 
-       [BinImages,NumBinImages,MAX_DISTANCE] = Binning(image,BinSizes);
-    
-    %% Stabilizing Bins
-        BinMatrix = GetBinAllocations(BinSizes,MAX_DISTANCE,NumBinImages);
-        StabilityMatrix = GetStabilityMatrix(BinSizes,BinMatrix,MAX_DISTANCE);
-        StableBinImages = removeUnstableComponents(BinImages,BinSizes,StabilityMatrix,BinMatrix,hasParametersSupplied,Parameters,StabilityPredictor);
-        StableBinImages = reduceToMainCCs(StableBinImages); 
-    %% Splitting into Aligned and Non-Aligned
-        [CCs,CCstats,Features] = GetTextGroupFeatures(StableBinImages,BinSizes);
-        BoundingBoxes = GetBoundingBoxes(CCs,CCstats,Features,false,hasParametersSupplied,Parameters); % No Need to Stabilize,so false
-        
-        return 
-        
-        
-    %%END OF DUAL PASS CODE         
-        
-      
-    %% SINGLE PASS CODE
-         [BinImages,NumBinImages,MAX_DISTANCE] = Binning(image,BinSizes);
-         BinMatrix = GetBinAllocations(BinSizes,MAX_DISTANCE,NumBinImages);
-         StabilityMatrix = GetStabilityMatrix(BinSizes,BinMatrix,MAX_DISTANCE);
-         [CCs,CCstats,Features,FinalBinImages] = GetAllFeatures(BinImages,BinSizes,StabilityMatrix,false);
-         
-         % If Parameters Supplied is a variable,iterate over this
-         BoundingBoxes = GetBoundingBoxes(CCs,CCstats,Features,true,hasParametersSupplied,Parameters); 
-
 
 end
