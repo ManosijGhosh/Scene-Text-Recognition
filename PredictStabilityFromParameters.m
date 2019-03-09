@@ -35,7 +35,7 @@ function [isStable] = PredictStabilityFromParameters(Features,Parameters)
   MAX_Params = Parameters(1,[1 2 4 5 8 9 10 12 14 6 3]);
   MIN_Params = [0 0 0 0 0 0 Parameters(1,[11 13 15 7]) 0];
   
-  IsStable = (Features <= MAX_Params) & (Features>= MIN_PARAMS); 
+  IsStable = (Features <= MAX_Params) & (Features>= MIN_Params); 
      if IsStable == 1
          isStable = true;
      else
