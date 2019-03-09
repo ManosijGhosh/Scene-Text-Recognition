@@ -2,7 +2,7 @@ function [fitness] = BinningGL(chromosome)
 global img;
 folderPath='with GT/';
 idir = dir(strcat(folderPath,'i (*).jpg'));
-nfiles = uint16(length(idir)*(1.0/10.0));    % Number of files found
+nfiles = uint16(length(idir)*(1.0/100.0));    % Number of files found
 
 
 accuracy = zeros(1,nfiles);
@@ -24,9 +24,19 @@ fitness = mean(accuracy);
 end
 
 
-function [textBoxes] = boundingBoxes(chromosome)
+function [BoundingBoxes] = boundingBoxes(parameters)
 % returns a list of tex boxes for all bin sizes
-textBoxes = [];
+global img;
+image = img;
+BinSizes = [32,47,62,76,90,103,116];
+hasParametersSupplied = true;
+[BinImages,NumBinImages,MAX_DISTANCE] = Binning(image,BinSizes);
+BinMatrix = GetBinAllocations(BinSizes,MAX_DISTANCE,NumBinImages);
+StabilityMatrix = GetStabilityMatrix(BinSizes,BinMatrix,MAX_DISTANCE);
+[CCs,CCstats,Features,~] = GetAllFeatures(BinImages,BinSizes,MAX_DISTANCE,StabilityMatrix,false);
+
+% If Parameters Supplied is a variable,iterate over this
+BoundingBoxes = GetBoundingBoxes(CCs,CCstats,Features,true,hasParametersSupplied,parameters);
 
 end
 

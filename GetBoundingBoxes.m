@@ -109,7 +109,7 @@ function [BoundingBoxes] = GetBoundingBoxes(CCs,CCstats,Features,NeedToStabilize
              if hasParametersSupplied
                  [isStable] = PredictStabilityFromParameters(Features(1,1:11),Parameters(1,1:15));
              else
-                 error("Need to supply Parameters if Unstable components supplied"); 
+                 error('Need to supply Parameters if Unstable components supplied'); 
              end
              
              if ~isStable
@@ -140,7 +140,7 @@ function [BoundingBoxes] = GetBoundingBoxes(CCs,CCstats,Features,NeedToStabilize
              if hasParametersSupplied
                  [isStable] = PredictStabilityFromParameters(Features(1,1:11),Parameters(1,1:14));
              else
-                 error("Need to supply Parameters if Unstable components supplied"); 
+                 error('Need to supply Parameters if Unstable components supplied'); 
              end
              
              if ~isStable

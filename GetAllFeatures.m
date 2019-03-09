@@ -1,4 +1,4 @@
-function [CCs,CCstats,Features,FinalBinImages] = GetAllFeatures(BinImages,BinSizes,StabilityCheckMatrix,getFinalBinImages) % Make 2nd one false for speed
+function [CCs,CCstats,Features,FinalBinImages] = GetAllFeatures(BinImages,BinSizes,MAX_DISTANCE,StabilityCheckMatrix,getFinalBinImages) % Make 2nd one false for speed
 
 
 %% Features Extracted
@@ -40,15 +40,33 @@ cc_no = 1;
  
  
 q_offset = 0;  
+img_en = 1;
          for i = 1:numel(BinSizes) %Must change Loop for change in Bin
          
+         if i~=1 && StabilityCheckMatrix(q_offset+1,1) ~= 0 && StabilityCheckMatrix(max(1,q_offset-2*main_offset+1),1) == 0
+            fprintf('GAP:: i = %d has a checking bin but before that does not',i);
+           continue; 
+        end
         main_offset = ceil(MAX_DISTANCE/BinSizes(i));
        k = ceil((BinSizes(i)/2)) -1;
-   
+       
+        if StabilityCheckMatrix(q_offset+1,1) ~= 0 && StabilityCheckMatrix(max(1,q_offset-2*main_offset),1) == 0
+            fprintf('ALL IMAGES UNDER same I not equal');
+           continue; 
+        end
+     
     %For 1st Level Bins
        for img_no = (q_offset+1):(q_offset+main_offset)
            close all
-         %fprintf("\nProcessing Bin No.: %d",img_no);
+         %fprintf('\nProcessing Bin No.: %d',img_no);
+        if StabilityCheckMatrix(img_no,1) == 0
+           continue; 
+        end
+        if StabilityCheckMatrix(img_no,1) ~= 0 && StabilityCheckMatrix(max(q_offset+1,img_no-1),1) == 0
+            fprintf('ALL IMAGES UNDER same I not equal');
+           continue; 
+        end
+        
         
         if img_no ~= (q_offset+main_offset)
           scan_img = logical(BinImages(:,:,img_no)+BinImages(:,:,(img_no+main_offset)));
@@ -57,14 +75,14 @@ q_offset = 0;
         end
 %         label_scan_img = bwlabel(scan_img);
         CC_scan_img = bwconncomp(scan_img);
-        CCs(img_no) = CC_scan_img;
-
+        CCs(img_en) = CC_scan_img;
+        
         
         lower_overlap_bin_no = img_no + main_offset-1;
         upper_overlap_bin_no = img_no+main_offset;
            if((img_no > NUM_BIN_IMAGES) || ((img_no+main_offset)> NUM_BIN_IMAGES && img_no~=q_offset+main_offset))
                
-              fprintf("\nLoop Error,img_value >134;printing loop at Bin Index: %d main_offset = %d ,q_offset = %d\n" ,main_offset,q_offset);
+              fprintf('\nLoop Error,img_value >134;printing loop at Bin Index: %d main_offset = %d ,q_offset = %d\n' ,main_offset,q_offset);
                
            end
         %The Smaller range against which to check stability
@@ -91,7 +109,12 @@ q_offset = 0;
       upper_range_bwimage = bwlabel(upper_range_check_img);
       
        stats = regionprops(CC_scan_img,'EulerNumber','Solidity','BoundingBox', 'Eccentricity', 'Extent');
-       CCstats(img_no) = stats;
+       try
+        CCstats(img_en) = stats;
+       catch
+          fprintf('\nimg_en: %d\n',img_en); 
+       end
+       img_en = img_en+1;
         lower_check_stats = regionprops(lower_range_check_img,'EulerNumber','Solidity');
        upper_check_stats = regionprops(upper_range_check_img,'EulerNumber','Solidity');
     for comp = 1:CC_scan_img.NumObjects
@@ -101,7 +124,7 @@ q_offset = 0;
       
         if  (lower_range_overlap_comp(1,2) ~= 0 || lower_range_overlap_comp(1,1) == 0) 
             if show_error
-             fprintf("\n Wrong Calculation in LOWER Range Check Image");
+             fprintf('\n Wrong Calculation in LOWER Range Check Image');
              figure('Name','ERROR:No Overlap Component !! K-means Component being scanned');
              error_figure(CC_scan_img.PixelIdxList{comp}) = 1;
              imshow(error_figure);
@@ -114,7 +137,7 @@ q_offset = 0;
         
         if  (upper_range_overlap_comp(1,2) ~= 0 || upper_range_overlap_comp(1,1) == 0 )  
             if show_error
-                fprintf("\n Wrong Calculation in LOWER Range Check Image");
+                fprintf('\n Wrong Calculation in LOWER Range Check Image');
                 figure('Name','ERROR:No Overlap Component!! K-means Component being scanned');
                 error_figure(CC_scan_img.PixelIdxList{comp}) = 1;
                 imshow(error_figure);
@@ -131,7 +154,7 @@ q_offset = 0;
         lower_range_comp_no_pixels = numel(lower_range_check_CC.PixelIdxList{lower_range_overlap_comp(1,1)});
         
         if show_error && (comp_num_of_pixels > lower_range_comp_no_pixels)        
-           fprintf("\nError in Finding Correct LOWER Range Component: Size of Overlap reduced ");
+           fprintf('\nError in Finding Correct LOWER Range Component: Size of Overlap reduced ');
            figure('Name','ERROR: Size Reduction!! K-means Component being scanned');
            error_figure(CC_scan_img.PixelIdxList{comp}) = 1;
            imshow(error_figure);
@@ -146,7 +169,7 @@ q_offset = 0;
         end
 
         if show_error && (comp_num_of_pixels > upper_range_comp_no_pixels)          
-          fprintf("\nError in Finding Correct UPPER Range Component: Size of Overlap reduced ");
+          fprintf('\nError in Finding Correct UPPER Range Component: Size of Overlap reduced ');
            figure('Name','ERROR: Size Reduction!! K-means Component being scanned');
            error_figure(CC_scan_img.PixelIdxList{comp}) = 1;
            imshow(error_figure);
@@ -198,20 +221,22 @@ q_offset = 0;
    % For 2nd Level Bins
      for img_no = (q_offset+main_offset+1):(q_offset+2*main_offset-1) 
          close all
-          % fprintf("\nProcessing Bin No.: %d",img_no);
+        if StabilityCheckMatrix(img_no,1) == 0
+           continue; 
+        end
         scan_img = logical(BinImages(:,:,img_no)+BinImages(:,:,(img_no-main_offset+1)));
-        
+  
       
 %         label_scan_img = bwlabel(scan_img);
         CC_scan_img = bwconncomp(scan_img);
-        CCs(img_no) = CC_scan_img;
+        CCs(img_en) = CC_scan_img;
         
         %The Smaller range against which to check stability
   
             lower_overlap_bin_no = img_no -main_offset;
         upper_overlap_bin_no = img_no-main_offset+1;
          if((img_no > NUM_BIN_IMAGES) || (lower_overlap_bin_no> NUM_BIN_IMAGES))              
-              fprintf("\nLoop Error,img_value >134;printing loop at Bin Index: %d main_offset = %d ,q_offset = %d\n" ,main_offset,q_offset);            
+              fprintf('\nLoop Error,img_value >134;printing loop at Bin Index: %d main_offset = %d ,q_offset = %d\n' ,main_offset,q_offset);            
          end
         lower_range_check_img = logical(BinImages(:,:,img_no)+BinImages(:,:,lower_overlap_bin_no) + BinImages(:,:,upper_overlap_bin_no));
 
@@ -228,7 +253,8 @@ q_offset = 0;
       upper_range_bwimage = bwlabel(upper_range_check_img);
       
        stats = regionprops(CC_scan_img,'EulerNumber','Solidity');
-       CCstats(img_no) = stats;
+       CCstats(img_en) = stats;
+       img_en = img_en+1;
         lower_check_stats = regionprops(lower_range_check_img,'EulerNumber','Solidity');
        upper_check_stats = regionprops(upper_range_check_img,'EulerNumber','Solidity');
     for comp = 1:CC_scan_img.NumObjects
@@ -238,7 +264,7 @@ q_offset = 0;
       
          if  (lower_range_overlap_comp(1,2) ~= 0 || lower_range_overlap_comp(1,1) == 0 )  
              if show_error
-                fprintf("\n Wrong Calculation in LOWER Range Check Image");
+                fprintf('\n Wrong Calculation in LOWER Range Check Image');
                 figure('Name','ERROR:No Overlap Component !! K-means Component being scanned');
                 error_figure(CC_scan_img.PixelIdxList{comp}) = 1;
                 imshow(error_figure);
@@ -251,7 +277,7 @@ q_offset = 0;
         
         if  (upper_range_overlap_comp(1,2) ~= 0 || upper_range_overlap_comp(1,1) == 0 ) 
             if show_error
-           fprintf("\n Wrong Calculation in LOWER Range Check Image");
+           fprintf('\n Wrong Calculation in LOWER Range Check Image');
            figure('Name','ERROR:No Overlap Component!! K-means Component being scanned');
            error_figure(CC_scan_img.PixelIdxList{comp}) = 1;
            imshow(error_figure);
@@ -268,7 +294,7 @@ q_offset = 0;
         lower_range_comp_no_pixels = numel(lower_range_check_CC.PixelIdxList{lower_range_overlap_comp(1,1)});
         
         if show_error && (comp_num_of_pixels > lower_range_comp_no_pixels)         
-           fprintf("\nError in Finding Correct LOWER Range Component: Size of Overlap reduced ");
+           fprintf('\nError in Finding Correct LOWER Range Component: Size of Overlap reduced ');
            figure('Name','ERROR: Size Reduction!! K-means Component being scanned');
            error_figure(CC_scan_img.PixelIdxList{comp}) = 1;
            imshow(error_figure);
@@ -283,7 +309,7 @@ q_offset = 0;
         end
 
         if show_error && (comp_num_of_pixels > upper_range_comp_no_pixels)         
-          fprintf("\nError in Finding Correct UPPER Range Component: Size of Overlap reduced ");
+          fprintf('\nError in Finding Correct UPPER Range Component: Size of Overlap reduced ');
            figure('Name','ERROR: Size Reduction!! K-means Component being scanned');
            error_figure(CC_scan_img.PixelIdxList{comp}) = 1;
            imshow(error_figure);
