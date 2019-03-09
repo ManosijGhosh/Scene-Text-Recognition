@@ -1,4 +1,10 @@
 function [timeexc,gbest_rank]=gps()
+
+%% Indra's Code
+global ExtractionDone;
+ExtractionDone = false;
+
+%%
 %mutation off
 tic
 %clc
@@ -13,8 +19,8 @@ lb=lbArray(functionNum);
 dimension=dimArray(functionNum);
 
 % variables requiring change ends
-n=50;   %number of points being considered
-iter=1000;
+n=5;   %number of points being considered
+iter=2;
 
 label=zeros(1,iter);
 valuesBest=zeros(1,iter);
@@ -31,12 +37,14 @@ velocities_pso=zeros(n,dimension);
 pbest=rank;
 pbest_particle=population;
 
-[population,rank,velocities_gsa,velocities_pso,~,pbest_particle]=chromosomeRank(population,rank,velocities_gsa,velocities_pso,pbest,pbest_particle,1,0);
+[population,rank,velocities_gsa,velocities_pso,~,pbest_particle]=chromosomeRank(population,rank,velocities_gsa,velocities_pso,pbest,pbest_particle,1,1);
 gbest_rank=rank(1);
 gbest_particle=population(1,:);
 pbest=rank;
 
 change=0;
+
+
 for count=1:iter
     %fprintf('Iteration - %d with gbest as - %f and current best %f change  - %f\n',count,double(gbest_rank),double(rank(1)),change);
     

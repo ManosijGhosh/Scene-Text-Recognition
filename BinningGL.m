@@ -1,5 +1,5 @@
 function [fitness] = BinningGL(chromosome)
-global img;
+global img ExtractionDone BinNumber FCCs FCCstats FFeatures;
 folderPath='with GT/';
 idir = dir(strcat(folderPath,'i (*).jpg'));
 nfiles = uint16(length(idir)*(1.0/100.0));    % Number of files found
@@ -8,6 +8,32 @@ nfiles = uint16(length(idir)*(1.0/100.0));    % Number of files found
 accuracy = zeros(1,nfiles);
 
 initialiseGT();
+
+if ExtractionDone == false
+    entryCC = 1;
+    entryCCst = 1;
+    entryF = 1;
+    for img_loop=1:nfiles
+        currentfilename = idir(img_loop).name;
+        imagePath=strcat(folderPath,currentfilename);
+        img = rgb2gray(imread(imagePath));
+        image = img;
+        BinSizes = [32,47,62,76,90,103,116];
+
+        [BinImages,NumBinImages,MAX_DISTANCE] = Binning(image,BinSizes);
+        BinMatrix = GetBinAllocations(BinSizes,MAX_DISTANCE,NumBinImages);
+        StabilityMatrix = GetStabilityMatrix(BinSizes,BinMatrix,MAX_DISTANCE);
+        [CCs,CCstats,Features,~] = GetAllFeatures(ReduceToMainCCs(BinImages),BinSizes,MAX_DISTANCE,StabilityMatrix,false);
+
+        FCCs(entryCC:entryCC+numel(CCs)-1) = CCs;
+        entryCC = entryCC + numel(CCs);
+        FCCstats(entryCCst:entryCCst+numel(CCstats)-1) = CCstats;
+        entryCCst = entryCCst + numel(CCstats);
+        FFeatures(entryF:entryF+size(Features,1)-1,:) = Features;
+        entryF = entryF+size(Features,1);
+    end
+    ExtractionDone = true;
+end
 
 for img_loop=1:nfiles
     currentfilename = idir(img_loop).name;
@@ -26,16 +52,13 @@ end
 
 function [BoundingBoxes] = boundingBoxes(parameters)
 % returns a list of tex boxes for all bin sizes
-global img;
-image = img;
-BinSizes = [32,47,62,76,90,103,116];
-hasParametersSupplied = true;
-[BinImages,NumBinImages,MAX_DISTANCE] = Binning(image,BinSizes);
-BinMatrix = GetBinAllocations(BinSizes,MAX_DISTANCE,NumBinImages);
-StabilityMatrix = GetStabilityMatrix(BinSizes,BinMatrix,MAX_DISTANCE);
-[CCs,CCstats,Features,~] = GetAllFeatures(BinImages,BinSizes,MAX_DISTANCE,StabilityMatrix,false);
+global img BinNumber FCCs FCCstats FFeatures;
 
-% If Parameters Supplied is a variable,iterate over this
+hasParametersSupplied = true;
+
+CCs = FCCs(entryCC:entryCC+BinNumber-1);
+% TODO: Initiliaze CCstats and Features
+
 BoundingBoxes = GetBoundingBoxes(CCs,CCstats,Features,true,hasParametersSupplied,parameters);
 
 end
