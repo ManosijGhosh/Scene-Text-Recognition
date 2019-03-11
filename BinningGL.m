@@ -1,37 +1,47 @@
 function [fitness] = BinningGL(chromosome)
-global img ExtractionDone BinNumber FCCs FCCstats FFeatures;
-folderPath='with GT/';
-idir = dir(strcat(folderPath,'i (*).jpg'));
-nfiles = uint16(length(idir)*(1.0/100.0));    % Number of files found
-
-
+global img ExtractionDone BinNumber FCCs FCCs_indexes FCCstats FCCstats_indexes FFeatures FFeatures_indexes;
+%folderPath='with GT/';
+folderPath = 'E:\ResearchFiles\DATA\test_input\';
+idir = dir(strcat(folderPath,'*.png'));
+nfiles = uint16(length(idir)*(1.0/100.0));    % Number of files found %OVERWRITTEN
+nfiles = length({idir.name});
 accuracy = zeros(1,nfiles);
 
-initialiseGT();
+%initialiseGT();
 
 if ExtractionDone == false
     entryCC = 1;
     entryCCst = 1;
     entryF = 1;
+    FCCstats_indexes = zeros(nfiles,2);
+    FFeatures_indexes = zeros(nfiles,2);
     for img_loop=1:nfiles
+        fprintf(">>>> Extracting Features for Image : %d\n",img_loop);
         currentfilename = idir(img_loop).name;
         imagePath=strcat(folderPath,currentfilename);
         img = rgb2gray(imread(imagePath));
         image = img;
         BinSizes = [32,47,62,76,90,103,116];
-
+        
         [BinImages,NumBinImages,MAX_DISTANCE] = Binning(image,BinSizes);
+        BinNumber = NumBinImages;
         BinMatrix = GetBinAllocations(BinSizes,MAX_DISTANCE,NumBinImages);
         StabilityMatrix = GetStabilityMatrix(BinSizes,BinMatrix,MAX_DISTANCE);
-        [CCs,CCstats,Features,~] = GetAllFeatures(ReduceToMainCCs(BinImages),BinSizes,MAX_DISTANCE,StabilityMatrix,false);
+        [CCs,CCstats,Features,~] = GetAllFeatures(ReduceToMainCCs(BinImages),BinSizes,MAX_DISTANCE,StabilityMatrix,false)
 
-        FCCs(entryCC:entryCC+numel(CCs)-1) = CCs;
+        tFCCs(entryCC:entryCC+numel(CCs)-1) = CCs;
+        FCCs_indexes(img_loop,:) = [entryCC entryCC+numel(CCs)-1];
         entryCC = entryCC + numel(CCs);
-        FCCstats(entryCCst:entryCCst+numel(CCstats)-1) = CCstats;
+        tFCCstats(entryCCst:entryCCst+numel(CCstats)-1) = CCstats;
+        FCCstats_indexes(img_loop,:) = [entryCCst entryCCst+numel(CCstats)-1];
         entryCCst = entryCCst + numel(CCstats);
-        FFeatures(entryF:entryF+size(Features,1)-1,:) = Features;
+        tFFeatures(entryF:entryF+size(Features,1)-1,:) = Features;
+        FFeatures_indexes(img_loop,:) = [entryF entryF+size(Features,1)-1];
         entryF = entryF+size(Features,1);
     end
+    FCCs = tFCCs;
+    FCCstats = tFCCstats;
+    FFeatures = tFFeatures;
     ExtractionDone = true;
 end
 
@@ -40,7 +50,7 @@ for img_loop=1:nfiles
     imagePath=strcat(folderPath,currentfilename);
     img = rgb2gray(imread(imagePath));
     
-    textBoxes = boundingBoxes(chromosome);
+    textBoxes = boundingBoxes(chromosome,img_loop);
     
     accuracy(img_loop) = overlapAccuracy(textBoxes, currentfilename);
     fprintf('Accuracy ratio - %f\n',accuracy(img_loop));
@@ -50,14 +60,24 @@ fitness = mean(accuracy);
 end
 
 
-function [BoundingBoxes] = boundingBoxes(parameters)
+function [BoundingBoxes] = boundingBoxes(parameters,img_no)
 % returns a list of tex boxes for all bin sizes
-global img BinNumber FCCs FCCstats FFeatures;
-
+global FCCs FCCs_indexes FCCstats FCCstats_indexes FFeatures FFeatures_indexes;
 hasParametersSupplied = true;
 
-CCs = FCCs(entryCC:entryCC+BinNumber-1);
-% TODO: Initiliaze CCstats and Features
+startCC =  FCCs_indexes(img_no,1);
+endCC = FCCs_indexes(img_no,2);
+
+startCCstats = FCCstats_indexes(img_no,1);
+endCCstats = FCCstats_indexes(img_no,2);
+
+startFeatures = FFeatures_indexes(img_no,1);
+endFeatures = FFeatures_indexes(img_no,2);
+
+CCs = FCCs(startCC:endCC)
+CCstats = FCCstats(startCCstats:endCCstats)
+Features = FFeatures(startFeatures:endFeatures,:)
+
 
 BoundingBoxes = GetBoundingBoxes(CCs,CCstats,Features,true,hasParametersSupplied,parameters);
 

@@ -28,6 +28,7 @@ function [CCs,CCstats,Features,FinalBinImages] = GetAllFeatures(BinImages,BinSiz
 [row,col,NUM_BIN_IMAGES] = size(BinImages);
 
 cc_no = 1;
+ccs_en = 1;
  palate = zeros(row,col);
  
  if getFinalBinImages
@@ -58,7 +59,18 @@ q_offset = 0;
     %For 1st Level Bins
        for img_no = (q_offset+1):(q_offset+main_offset)
            close all
-         %fprintf('\nProcessing Bin No.: %d',img_no);
+        % fprintf('Processing Bin No.: %d\n',img_no);
+        
+ 
+        
+        
+        if img_no ~= (q_offset+main_offset)
+          scan_img = logical(BinImages(:,:,img_no)+BinImages(:,:,(img_no+main_offset)));
+        else
+           scan_img = logical(BinImages(:,:,img_no));
+        end
+        CC_scan_img = bwconncomp(scan_img);
+        
         
         if StabilityCheckMatrix(img_no,1) == 0
            continue; 
@@ -69,19 +81,13 @@ q_offset = 0;
         end
         
         
-        if img_no ~= (q_offset+main_offset)
-          scan_img = logical(BinImages(:,:,img_no)+BinImages(:,:,(img_no+main_offset)));
-        else
-           scan_img = logical(BinImages(:,:,img_no));
-        end
-        
-        if scan_img(:,:) == 0
+        if CC_scan_img.NumObjects == 0
             continue;
         end
 %         label_scan_img = bwlabel(scan_img);
-        CC_scan_img = bwconncomp(scan_img);
         
-        CCs(img_no) = CC_scan_img;
+        CCs(ccs_en) = CC_scan_img;
+        ccs_en = ccs_en+1;
         
         
         lower_overlap_bin_no = img_no + main_offset-1;
@@ -227,7 +233,13 @@ q_offset = 0;
    
    % For 2nd Level Bins
      for img_no = (q_offset+main_offset+1):(q_offset+2*main_offset-1) 
+        % fprintf("Processing Bin No: %d\n",img_no);
          close all
+
+        scan_img = logical(BinImages(:,:,img_no)+BinImages(:,:,(img_no-main_offset+1)));
+        CC_scan_img = bwconncomp(scan_img);
+        
+                
         if StabilityCheckMatrix(img_no,1) == 0
            continue; 
         end
@@ -236,16 +248,13 @@ q_offset = 0;
             fprintf('ALL IMAGES UNDER same I not equal');
            continue; 
         end
-        scan_img = logical(BinImages(:,:,img_no)+BinImages(:,:,(img_no-main_offset+1)));
-        
-                
-        if scan_img(:,:) == 0
+        if CC_scan_img.NumObjects == 0
             continue;
         end
       
 %         label_scan_img = bwlabel(scan_img);
-        CC_scan_img = bwconncomp(scan_img);
-        CCs(img_no) = CC_scan_img;
+            CCs(ccs_en) = CC_scan_img;
+            ccs_en  = ccs_en+1;
        
         %The Smaller range against which to check stability
   
