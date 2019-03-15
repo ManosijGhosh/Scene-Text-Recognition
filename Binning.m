@@ -1,5 +1,5 @@
-function [BinImages,NUM_BIN_IMAGES,MAX_DISTANCE] = Binning( image,BinSizes)
-
+function [NUM_BIN_IMAGES,MAX_DISTANCE] = Binning( image,BinSizes)
+global BinImages
 %% This function Bins the images based on BinSizes and returns a set of Binary Images(:BinSizes) ,the number of such Images(:BUM_BIN_IMAGES)
 %  And the maximum value of a pixel(for grey scale it's 255)
 %CODE

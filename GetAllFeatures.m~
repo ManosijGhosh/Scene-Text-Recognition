@@ -21,10 +21,10 @@ global BinImages
    % 15. eHOG [0,1]
 
    Features = zeros(1,15);
-   FeatureValues = zeros(1,15);
+ 
 
 %% CODE
- show_error = true;  %% CHANGE TO TRUE TO SHOW ERRORS
+ show_error = false;  %% CHANGE TO TRUE TO SHOW ERRORS
 [row,col,NUM_BIN_IMAGES] = size(BinImages);
 
 cc_no = 1;
@@ -130,7 +130,6 @@ q_offset = 0;
     for comp = 1:CC_scan_img.NumObjects
             FeatureValues(:,:) = 0;
              CCstats(cc_no) = stats(comp);
-              Features(cc_no,:) = FeatureValues;
              cc_no = cc_no +1;
            lower_range_overlap_comp = findLabels(lower_range_bwimage(CC_scan_img.PixelIdxList{comp}),2); %Make to 1 for speed
            upper_range_overlap_comp = findLabels(upper_range_bwimage(CC_scan_img.PixelIdxList{comp}),2);
@@ -225,7 +224,6 @@ q_offset = 0;
 
         
     end
-    count_errors
     
     
         if getFinalBinImages
@@ -287,10 +285,7 @@ q_offset = 0;
         lower_check_stats = regionprops(lower_range_check_img,'EulerNumber','Solidity');
        upper_check_stats = regionprops(upper_range_check_img,'EulerNumber','Solidity');
     for comp = 1:CC_scan_img.NumObjects
-            FeatureValues(:,:) = 0;
-             CCstats(cc_no) = stats(comp);
-              Features(cc_no,:) = FeatureValues;
-             cc_no = cc_no +1;
+            CCstats(cc_no) = stats(comp);
            lower_range_overlap_comp = findLabels(lower_range_bwimage(CC_scan_img.PixelIdxList{comp}),2); %Make to 1 for speed
            upper_range_overlap_comp = findLabels(upper_range_bwimage(CC_scan_img.PixelIdxList{comp}),2);
       
