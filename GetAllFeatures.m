@@ -28,6 +28,7 @@ function [CCs,CCstats,Features,FinalBinImages] = GetAllFeatures(BinImages,BinSiz
 [row,col,NUM_BIN_IMAGES] = size(BinImages);
 
 cc_no = 1;
+ccs_en = 1;
  palate = zeros(row,col);
  
  if getFinalBinImages
@@ -40,7 +41,7 @@ cc_no = 1;
  
  
 q_offset = 0;  
-img_en = 1;
+
          for i = 1:numel(BinSizes) %Must change Loop for change in Bin
          
          if i~=1 && StabilityCheckMatrix(q_offset+1,1) ~= 0 && StabilityCheckMatrix(max(1,q_offset-2*main_offset+1),1) == 0
@@ -58,7 +59,19 @@ img_en = 1;
     %For 1st Level Bins
        for img_no = (q_offset+1):(q_offset+main_offset)
            close all
-         %fprintf('\nProcessing Bin No.: %d',img_no);
+        % fprintf('Processing Bin No.: %d\n',img_no);
+        
+ 
+        
+        
+        if img_no ~= (q_offset+main_offset)
+          scan_img = logical(BinImages(:,:,img_no)+BinImages(:,:,(img_no+main_offset)));
+        else
+           scan_img = logical(BinImages(:,:,img_no));
+        end
+        CC_scan_img = bwconncomp(scan_img);
+        
+        
         if StabilityCheckMatrix(img_no,1) == 0
            continue; 
         end
@@ -68,14 +81,13 @@ img_en = 1;
         end
         
         
-        if img_no ~= (q_offset+main_offset)
-          scan_img = logical(BinImages(:,:,img_no)+BinImages(:,:,(img_no+main_offset)));
-        else
-           scan_img = logical(BinImages(:,:,img_no));
+        if CC_scan_img.NumObjects == 0
+            continue;
         end
 %         label_scan_img = bwlabel(scan_img);
-        CC_scan_img = bwconncomp(scan_img);
-        CCs(img_en) = CC_scan_img;
+        
+        CCs(ccs_en) = CC_scan_img;
+        ccs_en = ccs_en+1;
         
         
         lower_overlap_bin_no = img_no + main_offset-1;
@@ -109,12 +121,8 @@ img_en = 1;
       upper_range_bwimage = bwlabel(upper_range_check_img);
       
        stats = regionprops(CC_scan_img,'EulerNumber','Solidity','BoundingBox', 'Eccentricity', 'Extent');
-       try
-        CCstats(img_en) = stats;
-       catch
-          fprintf('\nimg_en: %d\n',img_en); 
-       end
-       img_en = img_en+1;
+
+     
         lower_check_stats = regionprops(lower_range_check_img,'EulerNumber','Solidity');
        upper_check_stats = regionprops(upper_range_check_img,'EulerNumber','Solidity');
     for comp = 1:CC_scan_img.NumObjects
@@ -204,6 +212,11 @@ img_en = 1;
           
       
         Features(cc_no,:) = FeatureValues;
+       try
+        CCstats(cc_no) = stats(comp);
+       catch
+          fprintf('\nimg_en: %d\n',cc_no); 
+       end
         cc_no = cc_no + 1;
         
 
@@ -220,17 +233,29 @@ img_en = 1;
    
    % For 2nd Level Bins
      for img_no = (q_offset+main_offset+1):(q_offset+2*main_offset-1) 
+        % fprintf("Processing Bin No: %d\n",img_no);
          close all
+
+        scan_img = logical(BinImages(:,:,img_no)+BinImages(:,:,(img_no-main_offset+1)));
+        CC_scan_img = bwconncomp(scan_img);
+        
+                
         if StabilityCheckMatrix(img_no,1) == 0
            continue; 
         end
-        scan_img = logical(BinImages(:,:,img_no)+BinImages(:,:,(img_no-main_offset+1)));
-  
+        
+        if StabilityCheckMatrix(img_no,1) ~= 0 && StabilityCheckMatrix(max(q_offset+main_offset+1,img_no-1),1) == 0
+            fprintf('ALL IMAGES UNDER same I not equal');
+           continue; 
+        end
+        if CC_scan_img.NumObjects == 0
+            continue;
+        end
       
 %         label_scan_img = bwlabel(scan_img);
-        CC_scan_img = bwconncomp(scan_img);
-        CCs(img_en) = CC_scan_img;
-        
+            CCs(ccs_en) = CC_scan_img;
+            ccs_en  = ccs_en+1;
+       
         %The Smaller range against which to check stability
   
             lower_overlap_bin_no = img_no -main_offset;
@@ -252,9 +277,9 @@ img_en = 1;
       lower_range_bwimage = bwlabel(lower_range_check_img);
       upper_range_bwimage = bwlabel(upper_range_check_img);
       
-       stats = regionprops(CC_scan_img,'EulerNumber','Solidity');
-       CCstats(img_en) = stats;
-       img_en = img_en+1;
+       stats = regionprops(CC_scan_img,'EulerNumber','Solidity','BoundingBox', 'Eccentricity', 'Extent');
+   
+       
         lower_check_stats = regionprops(lower_range_check_img,'EulerNumber','Solidity');
        upper_check_stats = regionprops(upper_range_check_img,'EulerNumber','Solidity');
     for comp = 1:CC_scan_img.NumObjects
@@ -340,11 +365,19 @@ img_en = 1;
                
          
      Features(cc_no,:) = FeatureValues;
+      try
+        CCstats(cc_no) = stats(comp);
+      catch
+          fprintf('\nimg_en: %d\n',cc_no); 
+      end
      cc_no = cc_no + 1;
                    
     end
         
-    FinalBinImages(:,:,img_no) = scan_img;
+    if getFinalBinImages
+        FinalBinImages(:,:,img_no) = scan_img;
+    end
+     
     end
    
    q_offset = q_offset+2*main_offset-1;

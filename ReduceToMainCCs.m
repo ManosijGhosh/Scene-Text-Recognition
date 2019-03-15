@@ -1,7 +1,7 @@
 function [output_images] = ReduceToMainCCs(rgb_BinImages)
    
-     min_size_threshold = 5;
-     min_vol_threshold = 25;
+     min_size_threshold = 10;
+     min_vol_threshold = 50;
      pixel_percent_threshold = 0.004;
     
     [row,col,numImages] = size(rgb_BinImages);
