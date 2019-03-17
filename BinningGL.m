@@ -55,7 +55,7 @@ if ExtractionDone == false
             imagePath=strcat(folderPath,currentfilename);
             img = rgb2gray(imread(imagePath));
             image = img;
-            BinSizes = [32,47,62,76,90,103,116];
+            BinSizes = [32,50,62,77,95,118];
             
             fprintf(".....Binning Image.....\n");
             [NumBinImages,MAX_DISTANCE] = Binning(image,BinSizes);
