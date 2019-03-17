@@ -135,7 +135,7 @@ end
 
 %% EXTRACTING
 q_offset = 0;
-fprintf('....extracting..........\n\n');
+fprintf("....extracting..........\n\n");
 for i = 1:numel(BinSizes) %Must change Loop for change in Bin
     
     if i~=1 && StabilityCheckMatrix(q_offset+1,1) ~= 0 && StabilityCheckMatrix(max(1,q_offset-2*main_offset+1),1) == 0
