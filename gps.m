@@ -1,7 +1,7 @@
 function [timeexc,gbest_rank]=gps()
 
 %% Indra's Code
-global ExtractionDone;
+global ExtractionDone 
 ExtractionDone = false;
 
 %%
@@ -19,8 +19,8 @@ lb=lbArray(functionNum);
 dimension=dimArray(functionNum);
 
 % variables requiring change ends
-n=5;   %number of points being considered
-iter=2;
+n=50;   %number of points being considered
+iter=1000;
 
 label=zeros(1,iter);
 valuesBest=zeros(1,iter);

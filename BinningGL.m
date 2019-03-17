@@ -1,21 +1,20 @@
 function [fitness] = BinningGL(chromosome)
 global img ExtractionDone BinNumber FCCs FCCs_indexes FCCstats FCCstats_indexes FFeatures FFeatures_indexes;
-%folderPath='with GT/';
-folderPath = 'E:\ResearchFiles\DATA\test_input\';
-idir = dir(strcat(folderPath,'*.png'));
-%nfiles = uint16(length(idir)*(1.0/100.0));
-nfiles = 2;
+folderPath='with GT/';
+%folderPath = 'E:\ResearchFiles\DATA\test_input\';
+idir = dir(strcat(folderPath,'i (*).jpg'));
+nfiles = uint16(length(idir)*(1.0/100.0));
 accuracy = zeros(1,nfiles);
 
-%initialiseGT();
+initialiseGT();
 
 loadSavedVariables = false;
 
-if loadSavedVariables
+if ~ExtractionDone && loadSavedVariables
     load('FCCs.mat');
     load('FCCs_indexes.mat');
     load('FCCstats.mat');
-    load('FCCstats_indexes');
+    load('FCCstats_indexes.mat');
     load('FFeatures.mat');
     load('FFeatures_indexes.mat');
     load('ExtractedFileNames.mat');
@@ -27,21 +26,24 @@ if loadSavedVariables
     entryCCst = numel(FCCstats)+1;
     entryF = size(FFeatures,1)+1;
 else
-    NumFilesExtracted = 0;
-    ExtractedFileNames = strings(nfiles,1);
-    entryCC = 1;
-    entryCCst = 1;
-    entryF = 1;
-    FCCstats_indexes = zeros(nfiles,2);
-    FFeatures_indexes = zeros(nfiles,2);
-    FCCs_indexes = zeros(nfiles,2);
+    if ~ExtractionDone
+        NumFilesExtracted = 0;
+        ExtractedFileNames = strings(nfiles,1);
+        entryCC = 1;
+        entryCCst = 1;
+        entryF = 1;
+        FCCstats_indexes = zeros(nfiles,2);
+        FFeatures_indexes = zeros(nfiles,2);
+        FCCs_indexes = zeros(nfiles,2);
+    end
 end
 
 if ExtractionDone == false
     index_entry = NumFilesExtracted+1;
-    for img_loop=1:2
-       
-       % try
+
+    for img_loop=1:nfiles
+        
+        try
             fprintf(">>>> Extracting Features for Image : %d\n",img_loop);
             currentfilename = idir(img_loop).name;
             hasBeenDone = (ExtractedFileNames == string(currentfilename));
@@ -60,8 +62,6 @@ if ExtractionDone == false
             BinNumber = NumBinImages;
             BinMatrix = GetBinAllocations(BinSizes,MAX_DISTANCE,NumBinImages);
             StabilityMatrix = GetStabilityMatrix(BinSizes,BinMatrix,MAX_DISTANCE);
-            fprintf("......Removing Unncessary components.....\n");
-            ReduceToMainCCs();
             fprintf("......Extracting Features........\n");
             [CCs,CCstats,Features,~] = GetAllFeatures(BinSizes,MAX_DISTANCE,StabilityMatrix,false);
             
@@ -79,26 +79,28 @@ if ExtractionDone == false
             
             NumFilesExtracted = NumFilesExtracted + 1;
             ExtractedFileNames(NumFilesExtracted,1) = string(currentfilename);
-%         catch e
-%             fprintf("Error:: \n %s \n %s ",e.identifier,e.message);
-%             FCCs = tFCCs;
-%             FCCstats = tFCCstats;
-%             FFeatures = tFFeatures;
-%             save('FCCs.mat','FCCs');
-%             save('FCCs_indexes.mat','FCCs_indexes');
-%             save('FCCstats.mat','FCCstats');
-%             save('FCCstats_indexes.mat','FCCstats_indexes');
-%             save('FFeatures.mat','FFeatures');
-%             save('FFeatures_indexes.mat','FFeatures_indexes');
-%             save('ExtractedFileNames.mat','ExtractedFileNames');
-%             save('NumFilesExtracted.mat','NumFilesExtracted');
-%             ExtractionDone = true;
-%             error("THERE HAS BEEN ERROR");
-%         end
+        catch e
+            fprintf("Error:: \n %s \n %s ",e.identifier,e.message);
+            FCCs = tFCCs;
+            FCCstats = tFCCstats;
+            FFeatures = tFFeatures;
+            save('FCCs.mat','FCCs');
+            save('FCCs_indexes.mat','FCCs_indexes');
+            save('FCCstats.mat','FCCstats');
+            save('FCCstats_indexes.mat','FCCstats_indexes');
+            save('FFeatures.mat','FFeatures');
+            save('FFeatures_indexes.mat','FFeatures_indexes');
+            save('ExtractedFileNames.mat','ExtractedFileNames');
+            save('NumFilesExtracted.mat','NumFilesExtracted');
+            ExtractionDone = true;
+            error("THERE HAS BEEN ERROR");
+        end
     end
-    FCCs = tFCCs;
-    FCCstats = tFCCstats;
-    FFeatures = tFFeatures;
+    if exist('tFCCs','var') && exist('tFCCstats','var') && exist('tFFeatures','var')
+        FCCs = tFCCs;
+        FCCstats = tFCCstats;
+        FFeatures = tFFeatures;
+    end
     save('FCCs.mat','FCCs');
     save('FCCs_indexes.mat','FCCs_indexes');
     save('FCCstats.mat','FCCstats');
@@ -145,6 +147,7 @@ Features = FFeatures(startFeatures:endFeatures,:);
 
 
 BoundingBoxes = GetBoundingBoxes(CCs,CCstats,Features,true,hasParametersSupplied,parameters);
+
 
 end
 
