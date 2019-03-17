@@ -1,12 +1,13 @@
 function [fitness] = BinningGL(chromosome)
 global img ExtractionDone BinNumber FCCs FCCs_indexes FCCstats FCCstats_indexes FFeatures FFeatures_indexes;
 %folderPath='with GT/';
-folderPath = 'SmallTest/';
-idir = dir(strcat(folderPath,'i (*).jpg'));
-nfiles = uint16(length(idir)*(1.0/100.0));
+folderPath = 'E:\ResearchFiles\DATA\test_input\';
+idir = dir(strcat(folderPath,'*.png'));
+%nfiles = uint16(length(idir)*(1.0/100.0));
+nfiles = 2;
 accuracy = zeros(1,nfiles);
 
-initialiseGT();
+%initialiseGT();
 
 loadSavedVariables = false;
 
@@ -39,6 +40,7 @@ end
 if ExtractionDone == false
     index_entry = NumFilesExtracted+1;
     for img_loop=1:2
+       
        % try
             fprintf(">>>> Extracting Features for Image : %d\n",img_loop);
             currentfilename = idir(img_loop).name;
