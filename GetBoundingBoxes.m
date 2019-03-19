@@ -1,7 +1,7 @@
 function [BoundingBoxes] = GetBoundingBoxes(CCs,CCstats,Features,NeedToStabilize,hasParametersSupplied,Parameters)
 
     BoundingBoxes = zeros(1,4);
-    
+    Features = abs(Features);
     % NOTE: The Feature Values supplied need to be of already stable
     % componenets if hasParametersSupplied is false. 
     
@@ -28,7 +28,7 @@ function [BoundingBoxes] = GetBoundingBoxes(CCs,CCstats,Features,NeedToStabilize
     
     % 1.  Max Lower Range No. of Pixels Deviation Allowed ( Value > 0 and Value < 1 )
     % 2.  Max Higher Range No. of Pixels Deviation Allowed ( Value > 0 and Value < 1)
-    % 3.  Max Euler Number( Value > 1 and Value < Infinite )                  
+    % 3.  Max Euler Number/100( Value > 1 and Value < Infinite )                  
     % 4.  Max Difference in Euler Number for Lower Range/100( 0 <= Value < 1 )
     % 5.  Max Difference in Euler Number for Higher Range/100( 0 <= Value < 1 )
     % 6.  Max Solidity ( Value > 0 and Value < 1)
@@ -113,7 +113,7 @@ function [BoundingBoxes] = GetBoundingBoxes(CCs,CCstats,Features,NeedToStabilize
          
          if NeedToStabilize && component_class(comp,1) == 0
              if hasParametersSupplied
-                 [isStable] = PredictStabilityFromParameters(Features(1,1:11),Parameters(1,1:15));
+                 [isStable] = PredictStabilityFromParameters(Features(comp,1:11),Parameters(1,1:15));
              else
                  error('Need to supply Parameters if Unstable components supplied'); 
              end
@@ -129,22 +129,22 @@ function [BoundingBoxes] = GetBoundingBoxes(CCs,CCstats,Features,NeedToStabilize
          
          stats = CCstats(comp,:);
          
-         avg_height = stats.BoundingBox(4);
-         avg_baseline = stats.BoundingBox(2) + stats.BoundingBox(4);
-         max_y = stats.BoundingBox(1) + stats.BoundingBox(3);
-         max_x = stats.BoundingBox(2) + stats.BoundingBox(4);
+         avg_height = stats(1,4);
+         avg_baseline = stats(1,2) + stats(1,4);
+         max_y = stats(1,1) + stats(1,3);
+         max_x = stats(1,2) + stats(1,4);
          aligned_comps = zeros(1,20); % An Array of aligned comp labels, BUFFER OF UPTO 20 ALIGNED COMPONENTS 
          aligned_comps(1,:) = comp;
          aligns = 1;
-         sum_features = Features(comp,:);
+         sum_features = Features(comp,10:15);
          
-         BB = stats.BoundingBox;
+         BB = stats(:,:);
          
          for scan_comp = (comp+1):ends
           
            if NeedToStabilize && component_class(scan_comp,1) == 0
              if hasParametersSupplied
-                 [isStable] = PredictStabilityFromParameters(Features(1,1:11),Parameters(1,1:14));
+                 [isStable] = PredictStabilityFromParameters(Features(scan_comp,1:11),Parameters(1,1:15));
              else
                  error('Need to supply Parameters if Unstable components supplied'); 
              end
@@ -158,31 +158,31 @@ function [BoundingBoxes] = GetBoundingBoxes(CCs,CCstats,Features,NeedToStabilize
            end %Stabilization done
          
           
-             scan_stats = CCstats(scan_comp);
-             spacing_dev = abs(scan_stats.BoundingBox(1) - max_y)/avg_height;
+             scan_stats = CCstats(scan_comp,:);
+             spacing_dev = abs(scan_stats(1,1) - max_y)/avg_height;
              if spacing_dev > 1.25*GroupingParams(1,2) % CRITICAL ASSUME: Once components reach a certain distance horizontally,it keeps on increasing
                 break; 
              end
-             baseline_dev = abs(scan_stats.BoundingBox(2) + scan_stats.BoundingBox(4) - avg_baseline)/avg_height;
-             height_dev =  abs(scan_stats.BoundingBox(4) - avg_height)/avg_height;
-             startPoint_diff = (max_y - scan_stats.BoundingBox(1))/avg_height;
+             baseline_dev = abs(scan_stats(1,2) + scan_stats(1,4) - avg_baseline)/avg_height;
+             height_dev =  abs(scan_stats(1,4) - avg_height)/avg_height;
+             startPoint_diff = (max_y - scan_stats(1,1))/avg_height;
              
              C_Arr = [baseline_dev spacing_dev height_dev startPoint_diff];
              isAligned = C_Arr <= GroupingParams;
              
              if isAligned == 1
                  
-                 avg_height = (avg_height*aligns + scan_stats.BoundingBox(4))/(aligns+1);
-                 avg_baseline = (avg_baseline*aligns + (scan_stats.BoundingBox(2) + scan_stats.BoundingBox(4)))/(aligns+1);
-                 max_y = max(max_y,scan_stats.BoundingBox(1)+scan_stats.BoundingBox(3));
-                 max_x = max(max_x,scan_stats.BoundingBox(2)+scan_stats.BoundingBox(4));
+                 avg_height = (avg_height*aligns + scan_stats(1,4))/(aligns+1);
+                 avg_baseline = (avg_baseline*aligns + (scan_stats(1,2) + scan_stats(1,4)))/(aligns+1);
+                 max_y = max(max_y,scan_stats(1,1)+scan_stats(1,3));
+                 max_x = max(max_x,scan_stats(1,2)+scan_stats(1,4));
                  aligns = aligns + 1;
                  aligned_comps(1,aligns) = scan_comp;
-                 sum_features = sum_features + Features(scan_comp,:);
+                 sum_features = sum_features + Features(scan_comp,10:15);
                  
-                 BB(1,1) = min(BB(1,1),scan_stats.BoundingBox(1));  %%Increasing the Bounding Box
+                 BB(1,1) = min(BB(1,1),scan_stats(1,1));  %%Increasing the Bounding Box
                  BB(1,3) = max_y - BB(1,1);
-                 BB(1,2) = min(BB(1,2),scan_stats.BoundingBox(2));
+                 BB(1,2) = min(BB(1,2),scan_stats(1,2));
                  BB(1,4) = max_x - BB(1,2);
              end
              
