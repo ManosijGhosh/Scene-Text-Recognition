@@ -1,6 +1,6 @@
-function [CCs,CCstats,Features,FinalBinImages] = GetAllFeatures(BinSizes,MAX_DISTANCE,StabilityCheckMatrix,getFinalBinImages) % Make 2nd one false for speed
+function [PageEndings,statsBoxes,Features,FinalBinImages] = GetAllFeatures(BinSizes,MAX_DISTANCE,StabilityCheckMatrix,getFinalBinImages) % Make 2nd one false for speed
 
-global BinImages 
+global BinImages
 %% Features Extracted
 
 % 1. Lower Range Pixel Deviatiion ([0,Inf])
@@ -20,16 +20,20 @@ global BinImages
 % 14. SVT [0,1]
 % 15. eHOG [0,1]
 
-Features = zeros(1,15);
-FeatureValues = zeros(1,15);
+
+
 
 %% CODE
 show_error = true;  %% CHANGE TO TRUE TO SHOW ERRORS
 [row,col,NUM_BIN_IMAGES] = size(BinImages);
 
+Features = zeros(1,15);
+PageEndings = zeros(1,NUM_BIN_IMAGES);
+prev=0;
+statsBoxes = zeros(1,4);
+
 cc_no = 1;
-ccs_en = 1;
-palate = zeros(row,col);
+
 
 
 if getFinalBinImages
@@ -136,6 +140,10 @@ end
 %% EXTRACTING
 q_offset = 0;
 fprintf("....extracting..........\n\n");
+
+
+
+
 for i = 1:numel(BinSizes) %Must change Loop for change in Bin
     
     if i~=1 && StabilityCheckMatrix(q_offset+1,1) ~= 0 && StabilityCheckMatrix(max(1,q_offset-2*main_offset+1),1) == 0
@@ -165,13 +173,14 @@ for i = 1:numel(BinSizes) %Must change Loop for change in Bin
             error('ALL IMAGES UNDER same I not equal');
         end
         
+        PageEndings(1,img_no) = prev + CC_scan_img.NumObjects;
+        prev = PageEndings(1,img_no);
         
         if CC_scan_img.NumObjects == 0
             continue;
         end
         
-        CCs(ccs_en) = CC_scan_img;
-        ccs_en = ccs_en+1;
+
         
         
         if((img_no > NUM_BIN_IMAGES) || ((img_no+main_offset)> NUM_BIN_IMAGES && img_no~=q_offset+main_offset))
@@ -196,9 +205,9 @@ for i = 1:numel(BinSizes) %Must change Loop for change in Bin
         lower_check_stats = regionprops(lower_range_check_img,'EulerNumber','Solidity');
         upper_check_stats = regionprops(upper_range_check_img,'EulerNumber','Solidity');
         CompFeatureValues = zeros(CC_scan_img.NumObjects,15);
-        
+        CompstatsBoxes = zeros(CC_scan_img.NumObjects,4);
         parfor comp = 1:CC_scan_img.NumObjects
- 
+            
             FeatureValues = zeros(1,15);
             
             
@@ -206,33 +215,33 @@ for i = 1:numel(BinSizes) %Must change Loop for change in Bin
             lower_range_overlap_comp = lower_range_bwimage(region(1)); %Make to 1 for speed
             upper_range_overlap_comp = upper_range_bwimage(region(1));
             
-%                         if  (lower_range_overlap_comp(1,2) ~= 0 || lower_range_overlap_comp(1,1) == 0)
-%                             if show_error
-%                                 fprintf('\n Wrong Calculation in LOWER Range Check Image in MAIN Loop for img_no = %d, i = %d',img_no,i);
-%             %                     figure('Name','ERROR:No Overlap Component !! K-means Component being scanned');
-%             %                     error_figure(CC_scan_img.PixelIdxList{comp}) = 1;
-%             %                     imshow(error_figure);
-%             %                     figure('Name','ERROR:Overlap Component !! The Lower Range Overlap Image');
-%             %                     error_figure(:,:) = 0;
-%             %                     imshow(lower_range_check_img);
-%                             end
-%                             %count_errors = count_errors +1;
-%                             continue;
-%                         end
-%             
-%                         if  (upper_range_overlap_comp(1,2) ~= 0 || upper_range_overlap_comp(1,1) == 0 )
-%                             if show_error
-%                                 fprintf('\n Wrong Calculation in UPPER Range Check Image in MAIN LOOP for img_no = %d, i = %d',img_no,i);
-%             %                     figure('Name','ERROR:No Overlap Component!!Component being scanned');
-%             %                     error_figure(CC_scan_img.PixelIdxList{comp}) = 1;
-%             %                     imshow(error_figure);
-%             %                     figure('Name','ERROR:No Overlap Component!! The Upper Range Overlap Image');
-%             %                     error_figure(:,:) = 0;
-%             %                     imshow(upper_range_check_img);
-%                             end
-%                            % count_errors = count_errors +1;
-%                             continue;
-%                         end
+            %                         if  (lower_range_overlap_comp(1,2) ~= 0 || lower_range_overlap_comp(1,1) == 0)
+            %                             if show_error
+            %                                 fprintf('\n Wrong Calculation in LOWER Range Check Image in MAIN Loop for img_no = %d, i = %d',img_no,i);
+            %             %                     figure('Name','ERROR:No Overlap Component !! K-means Component being scanned');
+            %             %                     error_figure(CC_scan_img.PixelIdxList{comp}) = 1;
+            %             %                     imshow(error_figure);
+            %             %                     figure('Name','ERROR:Overlap Component !! The Lower Range Overlap Image');
+            %             %                     error_figure(:,:) = 0;
+            %             %                     imshow(lower_range_check_img);
+            %                             end
+            %                             %count_errors = count_errors +1;
+            %                             continue;
+            %                         end
+            %
+            %                         if  (upper_range_overlap_comp(1,2) ~= 0 || upper_range_overlap_comp(1,1) == 0 )
+            %                             if show_error
+            %                                 fprintf('\n Wrong Calculation in UPPER Range Check Image in MAIN LOOP for img_no = %d, i = %d',img_no,i);
+            %             %                     figure('Name','ERROR:No Overlap Component!!Component being scanned');
+            %             %                     error_figure(CC_scan_img.PixelIdxList{comp}) = 1;
+            %             %                     imshow(error_figure);
+            %             %                     figure('Name','ERROR:No Overlap Component!! The Upper Range Overlap Image');
+            %             %                     error_figure(:,:) = 0;
+            %             %                     imshow(upper_range_check_img);
+            %                             end
+            %                            % count_errors = count_errors +1;
+            %                             continue;
+            %                         end
             
             comp_num_of_pixels = numel(CC_scan_img.PixelIdxList{comp});
             
@@ -287,11 +296,11 @@ for i = 1:numel(BinSizes) %Must change Loop for change in Bin
             
             
             CompFeatureValues(comp,:) = FeatureValues;
-            
+            CompstatsBoxes(comp,:) = stats(comp).BoundingBox;
             
         end
         Features(cc_no:cc_no+size(CompFeatureValues,1)-1,:) = CompFeatureValues;
-        CCstats(cc_no:cc_no+size(CompFeatureValues,1)-1) = stats;
+        statsBoxes(cc_no:cc_no+size(CompFeatureValues,1)-1,:) = CompstatsBoxes;
         cc_no = cc_no+size(CompFeatureValues,1);
         
         if getFinalBinImages
@@ -316,13 +325,14 @@ for i = 1:numel(BinSizes) %Must change Loop for change in Bin
             error('ALL IMAGES UNDER same I not equal');
         end
         
+        PageEndings(1,img_no) = prev + CC_scan_img.NumObjects;
+        prev = PageEndings(1,img_no);
         
         if CC_scan_img.NumObjects == 0
             continue;
         end
         
-        CCs(ccs_en) = CC_scan_img;
-        ccs_en = ccs_en+1;
+
         
         
         if((img_no > NUM_BIN_IMAGES) || ((img_no+main_offset)> NUM_BIN_IMAGES && img_no~=q_offset+main_offset))
@@ -347,6 +357,7 @@ for i = 1:numel(BinSizes) %Must change Loop for change in Bin
         lower_check_stats = regionprops(lower_range_check_img,'EulerNumber','Solidity');
         upper_check_stats = regionprops(upper_range_check_img,'EulerNumber','Solidity');
         CompFeatureValues = zeros(CC_scan_img.NumObjects,15);
+        CompstatsBoxes = zeros(CC_scan_img.NumObjects,4);
         
         parfor comp = 1:CC_scan_img.NumObjects
             FeatureValues = zeros(1,15);
@@ -356,33 +367,33 @@ for i = 1:numel(BinSizes) %Must change Loop for change in Bin
             lower_range_overlap_comp = lower_range_bwimage(region(1)); %Make to 1 for speed
             upper_range_overlap_comp = upper_range_bwimage(region(1));
             
-%                         if  (lower_range_overlap_comp(1,2) ~= 0 || lower_range_overlap_comp(1,1) == 0)
-%                             if show_error
-%                                 fprintf('\n Wrong Calculation in LOWER Range Check Image in MAIN Loop for img_no = %d, i = %d',img_no,i);
-%             %                     figure('Name','ERROR:No Overlap Component !! K-means Component being scanned');
-%             %                     error_figure(CC_scan_img.PixelIdxList{comp}) = 1;
-%             %                     imshow(error_figure);
-%             %                     figure('Name','ERROR:Overlap Component !! The Lower Range Overlap Image');
-%             %                     error_figure(:,:) = 0;
-%             %                     imshow(lower_range_check_img);
-%                             end
-%                             %count_errors = count_errors +1;
-%                             continue;
-%                         end
-%             
-%                         if  (upper_range_overlap_comp(1,2) ~= 0 || upper_range_overlap_comp(1,1) == 0 )
-%                             if show_error
-%                                 fprintf('\n Wrong Calculation in UPPER Range Check Image in MAIN LOOP for img_no = %d, i = %d',img_no,i);
-%             %                     figure('Name','ERROR:No Overlap Component!!Component being scanned');
-%             %                     error_figure(CC_scan_img.PixelIdxList{comp}) = 1;
-%             %                     imshow(error_figure);
-%             %                     figure('Name','ERROR:No Overlap Component!! The Upper Range Overlap Image');
-%             %                     error_figure(:,:) = 0;
-%             %                     imshow(upper_range_check_img);
-%                             end
-%                            % count_errors = count_errors +1;
-%                             continue;
-%                         end
+            %                         if  (lower_range_overlap_comp(1,2) ~= 0 || lower_range_overlap_comp(1,1) == 0)
+            %                             if show_error
+            %                                 fprintf('\n Wrong Calculation in LOWER Range Check Image in MAIN Loop for img_no = %d, i = %d',img_no,i);
+            %             %                     figure('Name','ERROR:No Overlap Component !! K-means Component being scanned');
+            %             %                     error_figure(CC_scan_img.PixelIdxList{comp}) = 1;
+            %             %                     imshow(error_figure);
+            %             %                     figure('Name','ERROR:Overlap Component !! The Lower Range Overlap Image');
+            %             %                     error_figure(:,:) = 0;
+            %             %                     imshow(lower_range_check_img);
+            %                             end
+            %                             %count_errors = count_errors +1;
+            %                             continue;
+            %                         end
+            %
+            %                         if  (upper_range_overlap_comp(1,2) ~= 0 || upper_range_overlap_comp(1,1) == 0 )
+            %                             if show_error
+            %                                 fprintf('\n Wrong Calculation in UPPER Range Check Image in MAIN LOOP for img_no = %d, i = %d',img_no,i);
+            %             %                     figure('Name','ERROR:No Overlap Component!!Component being scanned');
+            %             %                     error_figure(CC_scan_img.PixelIdxList{comp}) = 1;
+            %             %                     imshow(error_figure);
+            %             %                     figure('Name','ERROR:No Overlap Component!! The Upper Range Overlap Image');
+            %             %                     error_figure(:,:) = 0;
+            %             %                     imshow(upper_range_check_img);
+            %                             end
+            %                            % count_errors = count_errors +1;
+            %                             continue;
+            %                         end
             
             comp_num_of_pixels = numel(CC_scan_img.PixelIdxList{comp});
             
@@ -437,12 +448,13 @@ for i = 1:numel(BinSizes) %Must change Loop for change in Bin
             
             
             CompFeatureValues(comp,:) = FeatureValues;
-            
+            CompstatsBoxes(comp,:) = stats(comp).BoundingBox;
             
         end
         Features(cc_no:cc_no+size(CompFeatureValues,1)-1,:) = CompFeatureValues;
-        CCstats(cc_no:cc_no+size(CompFeatureValues,1)-1) = stats;
+        statsBoxes(cc_no:cc_no+size(CompFeatureValues,1)-1,:) = CompstatsBoxes;
         cc_no = cc_no+size(CompFeatureValues,1);
+        
         if getFinalBinImages
             FinalBinImages(:,:,img_no) = scan_img;
         end

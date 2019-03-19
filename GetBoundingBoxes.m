@@ -14,8 +14,8 @@ function [BoundingBoxes] = GetBoundingBoxes(CCs,CCstats,Features,NeedToStabilize
    % 5. Lower Range Density Deviation ([0,1])
    % 6. Higher Range Density Deviation ([0,1])
    % 7. No. of Pixels [0,1)
-   % 8. Height (1,1)
-   % 9. Width  (1,1)
+   % 8. Height [0,1)
+   % 9. Width  [0,1)
    % 10. Solidity [0,1]
    % 11. Euler/100 [0,1)
    
@@ -35,12 +35,12 @@ function [BoundingBoxes] = GetBoundingBoxes(CCs,CCstats,Features,NeedToStabilize
     % 7.  Min Solidity ( Value > 0 and Value < 1)
     % 8.  Max Lower Range Density Deviation Allowed ( 0 < Value < 1 )
     % 9.  Max Higher Range Density Deviation Allowed ( 0 < Value < 1 )
-    % 10.  Max No. of Pixels
-    % 11. Min No. of Pixels
-    % 12. Max Height
-    % 13. Min Height
-    % 14. Max Width
-    % 15. Min Width
+    % 10.  Max No. of Pixels Ratio
+    % 11. Min No. of Pixels Ratio
+    % 12. Max Height Ratio
+    % 13. Min Height Ratio
+    % 14. Max Width Ratio
+    % 15. Min Width Ratio
     
     
     % 16. Baseline Deviation by average height for aligned ( 0 < Value < 1 )
@@ -71,6 +71,9 @@ function [BoundingBoxes] = GetBoundingBoxes(CCs,CCstats,Features,NeedToStabilize
     % 38. Max SVT [0,1]
     % 39. Max eHOG [0,1]
     
+    % data = [0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.25 0.5 0.25 0.5
+    % 0.25 0.25 0.25 0.25 0.25 0.8 0.1 0.06 0 0.98 0 0.9 0 0.25 0.3
+    % 0.65 0.1 0.06 0 0.99 0 0.9 0.2 0.25 0.3]
     %% Parameter Initialization
          
        if hasParametersSupplied
@@ -97,8 +100,11 @@ function [BoundingBoxes] = GetBoundingBoxes(CCs,CCstats,Features,NeedToStabilize
                                                      % 2 - Text
                                                      % 3 - Stable Component
   
-  for i = 1:numel(CCs)
-     ends = start + CCs(i).NumObjects -1; 
+  for i = 1:size(CCs,2)
+      if CCs(1,i) == 0
+          continue;
+      end
+     ends = CCs(1,i); 
       
      for comp = start:ends
          if component_class(comp,1) == 1 || component_class(comp,1) == 2  %If already classified,skip over
@@ -121,7 +127,7 @@ function [BoundingBoxes] = GetBoundingBoxes(CCs,CCstats,Features,NeedToStabilize
          end % Stabilization done
          
          
-         stats = CCstats(comp);
+         stats = CCstats(comp,:);
          
          avg_height = stats.BoundingBox(4);
          avg_baseline = stats.BoundingBox(2) + stats.BoundingBox(4);
