@@ -11,5 +11,11 @@ function [data] = datacreate(n,dimension,lb,ub)
     end
     clear max min count;
     
-    data(1,:) =[1 1 1 1 1 1 0 1 1 1 0 1 0 1 0 1 1 1 1 1 0 1 0 1 0 1 0 1 1 1 0 1 0 1 0 1 0 1 1];
+%     ideal = [1 1 1 1 1 1 0 1 1 1 0 1 0 1 0 1 1 1 1 1 0 1 0 1 0 1 0 1 1 1 0 1 0 1 0 1 0 1 1];
+%     for i=1:n
+%         data(i,:) = ideal - (rand(1,dimension)-0.5)*0.1;
+%     end
+%     data = max(data,0);
+%     data = min(data,0);
+%     data(1,:) = ideal;
 end

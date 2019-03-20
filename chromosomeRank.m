@@ -9,7 +9,7 @@ function [population,rank,velocities_gsa,velocities_pso,pbest,pbest_particle]=ch
             %rank(i)=rand(1);
         end
     end
-    [~,temp]=sort(rank);
+    [~,temp]=sort(rank, 'descend');
     population=population(temp,:);
     rank=rank(temp);
     pbest=pbest(temp);

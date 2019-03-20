@@ -61,9 +61,9 @@ for count=1:iter
     
     population=min(population,ub);
     population=max(population,lb);
-    [population,rank,velocities_gsa,velocities_pso,pbest,pbest_particle]=chromosomeRank(population,rank,velocities_gsa,velocities_pso,pbest,pbest_particle,1,0);
+    [population,rank,velocities_gsa,velocities_pso,pbest,pbest_particle]=chromosomeRank(population,rank,velocities_gsa,velocities_pso,pbest,pbest_particle,1,1);
     
-    if (gbest_rank>=rank(1))
+    if (gbest_rank<=rank(1))
         gbest_rank=rank(1);
         gbest_particle=population(1,:);
     end
@@ -82,8 +82,8 @@ for count=1:iter
     else
         change=0;
     end
-    
-    %%{
+    disp(population);
+    %{
     [population]=mutation(population,rank,count,iter,change,(ub-lb));
     [population,rank,velocities_gsa,velocities_pso,pbest,pbest_particle]=chromosomeRank(population,rank,velocities_gsa,velocities_pso,pbest,pbest_particle,1,0);
     if (gbest_rank>=rank(1))
