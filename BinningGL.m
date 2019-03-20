@@ -4,7 +4,6 @@ folderPath='with GT/';
 %folderPath = 'E:\ResearchFiles\DATA\test_input\';
 idir = dir(strcat(folderPath,'i (*).jpg'));
 nfiles = uint16(length(idir)*(1.0/100.0));
-nfiles = 1;
 accuracy = zeros(1,nfiles);
 
 initialiseGT();
