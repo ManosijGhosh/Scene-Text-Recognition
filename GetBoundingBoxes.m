@@ -60,7 +60,7 @@ function [BoundingBoxes] = GetBoundingBoxes(CCs,CCstats,Features,NeedToStabilize
     % 28. Max Average SVT for aligned ( 0 < Value < 1)
     % 29. Max Average eHOG for aligned ( 0 < Value < 1)
     
-    % 20. Max Solidity [0,1]
+    % 30. Max Solidity [0,1]
     % 31. Min Solidity [0,Max Solidity]
     % 32. Max Euler Number [0,1)
     % 33. Min Euler Number [0,Max Euler)
