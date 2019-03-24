@@ -1,6 +1,6 @@
 function [PageEndings,statsBoxes,Features,FinalBinImages] = GetAllFeatures(BinSizes,MAX_DISTANCE,StabilityCheckMatrix,getFinalBinImages) % Make 2nd one false for speed
 
-global BinImages
+global BinImages ShowOutput
 %% Features Extracted
 
 % 1. Lower Range Pixel Deviatiion ([0,Inf])
@@ -49,11 +49,11 @@ lower_range_check_imgs = false(row,col,NUM_BIN_IMAGES);
 upper_range_check_imgs = false(row,col,NUM_BIN_IMAGES);
 lower_range_bwimages = zeros(row,col,NUM_BIN_IMAGES);
 upper_range_bwimages = zeros(row,col,NUM_BIN_IMAGES);
-fprintf(".......preprocessing.........\n");
+fprintf(".......preprocessing......... Non PARALLEL\n");
 q_offset = 0;
 for i = 1:numel(BinSizes)
     main_offset = ceil(MAX_DISTANCE/BinSizes(i));
-    parfor img_no = (q_offset+1):(q_offset+main_offset)
+    for img_no = (q_offset+1):(q_offset+main_offset)
         
         if img_no ~= (q_offset+main_offset)
             scan_imgs(:,:,img_no) = ReduceToMainCCs(logical(BinImages(:,:,img_no)+BinImages(:,:,(img_no+main_offset))));
@@ -99,7 +99,7 @@ for i = 1:numel(BinSizes)
         upper_range_bwimages(:,:,img_no) = bwlabel(upper_range_check_imgs(:,:,img_no));
     end
     
-    parfor img_no = (q_offset+main_offset+1):(q_offset+2*main_offset-1)
+    for img_no = (q_offset+main_offset+1):(q_offset+2*main_offset-1)
         
         scan_imgs(:,:,img_no) = ReduceToMainCCs(logical(BinImages(:,:,img_no)+BinImages(:,:,(img_no-main_offset+1))));
         
@@ -463,8 +463,8 @@ for i = 1:numel(BinSizes) %Must change Loop for change in Bin
     
     q_offset = q_offset+2*main_offset-1;
 end
+fprintf("..To be removed...\n");
+PageEndings
 
-
-
-
+ShowOutput(:,:,1:2:end) = scan_imgs;
 end
