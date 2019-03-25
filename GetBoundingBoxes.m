@@ -1,4 +1,4 @@
-function GetBoundingBoxes(CCs,CCstats,Features,NeedToStabilize,hasParametersSupplied,Parameters)
+function [BoundingBoxes] = GetBoundingBoxes(CCs,CCstats,Features,NeedToStabilize,hasParametersSupplied,Parameters)
 
 BoundingBoxes = zeros(1,4);
 Features = abs(Features);
@@ -108,7 +108,7 @@ for i = 1:size(CCs,2)
     end
     ends = CCs(1,i);
     
-   
+ 
     
     for comp = start:ends
         if component_class(comp,1) == 1 || component_class(comp,1) == 2  %If already classified,skip over
@@ -207,7 +207,7 @@ for i = 1:size(CCs,2)
         
         if isTextGroup == 1
             numBBs = numBBs + 1;
-            BoundingBoxes(numBBs,:) = BB;  
+            BoundingBoxes(numBBs,:) = BB;       
             component_class(aligned_comps,1) = 2;
         else
             component_class(aligned_comps,1) = 1;
@@ -217,5 +217,6 @@ for i = 1:size(CCs,2)
     start = ends + 1;
 end
 
+CountBoxes = size(BoundingBoxes,1)
 end
 

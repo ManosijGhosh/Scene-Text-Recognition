@@ -207,7 +207,7 @@ for i = 1:size(CCs,2)
             isTextGroup = (C_Arr <= NonAlignedGroupParams_MAX ) & ( C_Arr >= NonAlignedGroupParams_MIN );
         end
         
-%        if isTextGroup == 1
+        if isTextGroup == 1
             numBBs = numBBs + 1;
             BoundingBoxes(numBBs,:) = BB;
             BB = round(BB);
@@ -224,9 +224,9 @@ for i = 1:size(CCs,2)
             ShowOutput(:,:,2*i) = img;
             
             component_class(aligned_comps,1) = 2;
-%         else
-%             component_class(aligned_comps,1) = 1;
-%         end
+        else
+            component_class(aligned_comps,1) = 1;
+        end
 %         
     end
     start = ends + 1;

@@ -1,7 +1,7 @@
 function [fitness] = BinningGL(chromosome)
 global img ExtractionDone BinNumber FCCs FCCs_indexes FCCstats FCCstats_indexes FFeatures FFeatures_indexes;
 folderPath='with GT/';
-folderPath = 'E:\ResearchFiles\DATA\Scene-Text-Recognition-GIAN\with GT\'; % Path on Indra's Machine only
+%folderPath = 'E:\ResearchFiles\DATA\Scene-Text-Recognition-GIAN\with GT\'; % Path on Indra's Machine only
 idir = dir(strcat(folderPath,'i (*).jpg'));
 nfiles = 4;
 accuracy = zeros(1,nfiles);
@@ -73,7 +73,7 @@ if ExtractionDone == false
         StabilityMatrix = GetStabilityMatrix(BinSizes,BinMatrix,MAX_DISTANCE);
         fprintf("......Extracting Features........\n");
         [CCs,CCstats,Features,~] = GetAllFeatures(BinSizes,MAX_DISTANCE,StabilityMatrix,false);
-        
+        CCs
         tFCCs(entryCC:entryCC+size(CCs,1)-1,:) = CCs;
         FCCs_indexes(index_entry,:) = [entryCC (entryCC+size(CCs,1)-1)];
         entryCC = entryCC + size(CCs,1);

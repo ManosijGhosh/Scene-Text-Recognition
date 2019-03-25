@@ -1,7 +1,7 @@
 function viewWorking(isImageBinned,isImageCombined,image_no,ShowOutput_dir,file_ext)
 global BinImages ShowOutput FCCs FCCs_indexes FCCstats FCCstats_indexes FFeatures FFeatures_indexes ExtractedFileNames
-
-folderPath = 'E:\ResearchFiles\DATA\test_input\'; % Path on Indra's Machine only
+folderPath='with GT/';
+%folderPath = 'E:\ResearchFiles\DATA\test_input\'; % Path on Indra's Machine only
 idir = dir(strcat(folderPath,'i (*).jpg'));
 nfiles = 1;
 
@@ -13,7 +13,7 @@ nfiles = 1;
 % load('FFeatures.mat')
 % load('FFeatures_indexes.mat')
 
-currentfilename = idir(1).name;
+currentfilename = idir(image_no).name;
 
 imagePath=strcat(folderPath,currentfilename);
 img = rgb2gray(imread(imagePath));
@@ -104,7 +104,7 @@ load('viewWorkingCCs.mat','CCs')
 % Features = FFeatures(startFeatures:endFeatures,:);
 
 hasParametersSupplied = true;
-parameters = [1 1 1 1 1 1 0 1 1 1 0 1 0 1 0 1 1 1 1 1 0 1 0 1 0 1 0 1 1 1 0 1 0 1 0 1 0 1 1];
+parameters = 0.75*[1 1 1 1 1 1 0 1 1 1 0 1 0 1 0 1 1 1 1 1 0 1 0 1 0 1 0 1 1 1 0 1 0 1 0 1 0 1 1];
 parameters(1,16:19) = 0.75;
 fprintf("......Get Bounding Boxes...\n");
 MapBB(CCs,CCstats,Features,true,hasParametersSupplied,parameters);

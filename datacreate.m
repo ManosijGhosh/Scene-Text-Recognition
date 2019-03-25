@@ -7,17 +7,19 @@ function [data] = datacreate(n,dimension,lb,ub)
     for i=1:n
         temp=rand(1,dimension);
         temp=temp*(ub-lb)+lb;
-        data(i,:)=temp;
+        data(i,:)=2*temp;  %*2 Added
     end
     clear max min count;
     
-    ideal = [1 1 1 1 1 1 0 1 1 1 0 1 0 1 0 0.25 0.25 0.25 0.25 1 0 1 0 1 0 1 0 1 1 1 0 1 0 1 0 1 0 1 1];
-    %data(1,:) = ideal;
-    for i=1:n
-        data(i,:) = ((~ideal*0.25).*data(i,:)) + ((ideal).*data(i,:));
-    end
+    ideal = [1 1 1 1 1 1 0 1 1 1 0 1 0 1 0 1 1 1 1 1 0 1 0 1 0 1 0 1 1 1 0 1 0 1 0 1 0 1 1];
+    
+    data(:,~ideal) = max(0.25,data(:,~ideal));
     data(1,:) = ideal;
-     data = max(data,0);
-     data = min(data,0);
+%     for i=1:n
+%         data(i,:) = min(2,abs(data(i,:)-2));
+%     end
+%     data(1,:) = ideal;
+%      data = max(data,0);
+%      data = min(data,0);
      
 end
