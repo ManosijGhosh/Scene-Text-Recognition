@@ -104,8 +104,8 @@ load('viewWorkingCCs.mat','CCs')
 % Features = FFeatures(startFeatures:endFeatures,:);
 
 hasParametersSupplied = true;
-parameters = 0.75*[1 1 1 1 1 1 0 1 1 1 0 1 0 1 0 1 1 1 1 1 0 1 0 1 0 1 0 1 1 1 0 1 0 1 0 1 0 1 1];
-parameters(1,16:19) = 0.75;
+parameters = [1 1 1 1 1 1 0 1 1 1 0 1 0 1 0 1 1 1 1 1 0 1 0 1 0 1 0 1 1 1 0 1 0 1 0 1 0 1 1];
+parameters(1,16:19) = 2;
 fprintf("......Get Bounding Boxes...\n");
 MapBB(CCs,CCstats,Features,true,hasParametersSupplied,parameters);
 

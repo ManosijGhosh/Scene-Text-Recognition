@@ -142,7 +142,7 @@ end
 
 function [BoundingBoxes] = boundingBoxes(parameters,img_no)
 % returns a list of tex boxes for all bin sizes
-global FCCs FCCs_indexes FCCstats FCCstats_indexes FFeatures FFeatures_indexes;
+global FCCs FCCs_indexes FCCstats FCCstats_indexes FFeatures FFeatures_indexes CheckTextGroup CheckisStable;
 hasParametersSupplied = true;
 
 startCC =  FCCs_indexes(img_no,1);
@@ -154,13 +154,19 @@ endCCstats = FCCstats_indexes(img_no,2);
 startFeatures = FFeatures_indexes(img_no,1);
 endFeatures = FFeatures_indexes(img_no,2);
 
+% FFeatures = normalize(FFeatures,1,'range');
+% FFeatures(:,7) = FFeatures(:,7)*10;
+ FFeatures(:,15) = FFeatures(:,11).*10;
+
 CCs = FCCs(startCC:endCC,:);
 CCstats = FCCstats(startCCstats:endCCstats,:);
 Features = FFeatures(startFeatures:endFeatures,:);
 
-
+CheckTextGroup = zeros(1,6);
+CheckisStable = zeros(1,11);
 BoundingBoxes = GetBoundingBoxes(CCs,CCstats,Features,true,hasParametersSupplied,parameters);
-
+ %CheckisStable
+ %CheckTextGroup
 
 end
 

@@ -2,6 +2,9 @@ function [BoundingBoxes] = GetBoundingBoxes(CCs,CCstats,Features,NeedToStabilize
 
 BoundingBoxes = zeros(1,4);
 Features = abs(Features);
+global CheckTextGroup;
+
+ %Parameters
 % NOTE: The Feature Values supplied need to be of already stable
 % componenets if hasParametersSupplied is false.
 
@@ -205,18 +208,18 @@ for i = 1:size(CCs,2)
             isTextGroup = (C_Arr <= NonAlignedGroupParams_MAX ) & ( C_Arr >= NonAlignedGroupParams_MIN );
         end
         
-        if isTextGroup == 1
+        if isTextGroup(1,1:5) == 1
             numBBs = numBBs + 1;
             BoundingBoxes(numBBs,:) = BB;       
             component_class(aligned_comps,1) = 2;
         else
             component_class(aligned_comps,1) = 1;
         end
-%         
+         CheckTextGroup = CheckTextGroup + isTextGroup; 
     end
     start = ends + 1;
 end
 
-CountBoxes = size(BoundingBoxes,1)
+% CountBoxes = size(BoundingBoxes,1)
 end
 
