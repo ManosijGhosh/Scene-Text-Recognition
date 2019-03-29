@@ -35,11 +35,11 @@ function [isStable] = PredictStabilityFromParameters(Features,Parameters)
    %% CODE
  
   MIN_Params = [0 0 0 0 0 0 Parameters(1,[11 13 15 7]) 0];
-   MAX_Params = Parameters(1,[1 2 4 5 8 9 10 12 14 6 3]) + MIN_Params;
+   MAX_Params = Parameters(1,[1 2 4 5 8 9 10 12 14 6 3]);
 %    Features(1,[3,4,11]) =  0;
   IsStable = (Features <= MAX_Params) & (Features>= MIN_Params);
   CheckisStable = CheckisStable + IsStable;
-     if IsStable(1,[1 2 3 4 5 6 8 9 10]) == 1
+     if IsStable == 1
          isStable = true;
      else
          isStable = false;

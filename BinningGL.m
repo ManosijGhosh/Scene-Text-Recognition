@@ -156,17 +156,19 @@ endFeatures = FFeatures_indexes(img_no,2);
 
 % FFeatures = normalize(FFeatures,1,'range');
 % FFeatures(:,7) = FFeatures(:,7)*10;
- FFeatures(:,15) = FFeatures(:,11).*10;
+ %FFeatures(:,15) = FFeatures(:,11).*10;
 
 CCs = FCCs(startCC:endCC,:);
 CCstats = FCCstats(startCCstats:endCCstats,:);
 Features = FFeatures(startFeatures:endFeatures,:);
 
+ Features(:,[3 4 11]) = Features(:,[3 4 11])./1000;
+% Features(:,[8 9]) = Features(:,[8,9])*10; 
 CheckTextGroup = zeros(1,6);
 CheckisStable = zeros(1,11);
 BoundingBoxes = GetBoundingBoxes(CCs,CCstats,Features,true,hasParametersSupplied,parameters);
- %CheckisStable
- %CheckTextGroup
+%  CheckisStable
+%  CheckTextGroup
 
 end
 
