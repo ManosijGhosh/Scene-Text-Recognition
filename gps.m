@@ -10,8 +10,9 @@ tic
 %clc
 rng('shuffle');
 functionNum = 1;
+scale = 100;
 % these need variables to be changed for each function, refer to the tables in the paper
-ubArray=ones(1,1);
+ubArray=ones(1,1)*scale;
 lbArray=zeros(1,1);
 dimArray=39;
 ub=ubArray(functionNum);
@@ -30,14 +31,14 @@ valuesAvg=zeros(1,iter);
     rank=vpa(zeros(1,n));
     velocities=vpa(zeros(n,dimension));
 %}
-population=(datacreate(n,dimension,lb,ub));
+population = datacreate(n,dimension,scale,lb,ub);
 rank=(zeros(1,n));
 velocities_gsa=(zeros(n,dimension));
 velocities_pso=zeros(n,dimension);
 pbest=rank;
 pbest_particle=population;
 
-[population,rank,velocities_gsa,velocities_pso,~,pbest_particle]=chromosomeRank(population,rank,velocities_gsa,velocities_pso,pbest,pbest_particle,1,1);
+[population,rank,velocities_gsa,velocities_pso,~,pbest_particle]=chromosomeRank(population,rank,velocities_gsa,velocities_pso,pbest,pbest_particle,scale,1,1);
 gbest_rank=rank(1);
 gbest_particle=population(1,:);
 pbest=rank;
@@ -61,7 +62,7 @@ for count=1:iter
     
     population=min(population,ub);
     population=max(population,lb);
-    [population,rank,velocities_gsa,velocities_pso,pbest,pbest_particle]=chromosomeRank(population,rank,velocities_gsa,velocities_pso,pbest,pbest_particle,1,1);
+    [population,rank,velocities_gsa,velocities_pso,pbest,pbest_particle]=chromosomeRank(population,rank,velocities_gsa,velocities_pso,pbest,pbest_particle,scale,1,1);
     
     if (gbest_rank<=rank(1))
         gbest_rank=rank(1);
@@ -85,7 +86,7 @@ for count=1:iter
     disp(population);
     %{
     [population]=mutation(population,rank,count,iter,change,(ub-lb));
-    [population,rank,velocities_gsa,velocities_pso,pbest,pbest_particle]=chromosomeRank(population,rank,velocities_gsa,velocities_pso,pbest,pbest_particle,1,0);
+    [population,rank,velocities_gsa,velocities_pso,pbest,pbest_particle]=chromosomeRank(population,rank,velocities_gsa,velocities_pso,pbest,pbest_particle,scale,1,0);
     if (gbest_rank>=rank(1))
         gbest_rank=rank(1);
         gbest_particle=population(1,:);

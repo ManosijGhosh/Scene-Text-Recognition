@@ -220,6 +220,6 @@ for i = 1:size(CCs,2)
     start = ends + 1;
 end
 
-% CountBoxes = size(BoundingBoxes,1)
+ CountBoxes = size(BoundingBoxes,1)
 end
 

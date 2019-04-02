@@ -1,11 +1,11 @@
-function [population,rank,velocities_gsa,velocities_pso,pbest,pbest_particle]=chromosomeRank(population,rank,velocities_gsa,velocities_pso,pbest,pbest_particle,flag,dflag)
+function [population,rank,velocities_gsa,velocities_pso,pbest,pbest_particle]=chromosomeRank(population,rank,velocities_gsa,velocities_pso,pbest,pbest_particle,scale,flag,dflag)
 %1st flag if 1 then chromosomes are to be ranked
 %2nd dflag if 1 then display the population
     rng('shuffle');
     [r,~]=size(population);
     if flag==1
         for i=1:r
-            [rank(i)]=classify(population(i,:));
+            [rank(i)]=classify(population(i,:)./scale);
             %rank(i)=rand(1);
         end
     end

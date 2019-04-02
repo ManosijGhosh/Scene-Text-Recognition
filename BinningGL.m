@@ -73,7 +73,7 @@ if ExtractionDone == false
         StabilityMatrix = GetStabilityMatrix(BinSizes,BinMatrix,MAX_DISTANCE);
         fprintf("......Extracting Features........\n");
         [CCs,CCstats,Features,~] = GetAllFeatures(BinSizes,MAX_DISTANCE,StabilityMatrix,false);
-        CCs
+        %CCs
         tFCCs(entryCC:entryCC+size(CCs,1)-1,:) = CCs;
         FCCs_indexes(index_entry,:) = [entryCC (entryCC+size(CCs,1)-1)];
         entryCC = entryCC + size(CCs,1);
@@ -131,7 +131,7 @@ for img_loop=1:nfiles
     img = rgb2gray(imread(imagePath));
     
     textBoxes = boundingBoxes(chromosome,img_loop);
-    
+    %disp(textBoxes);
     accuracy(img_loop) = overlapAccuracy(textBoxes, currentfilename);
     fprintf('Accuracy ratio - %f\n',accuracy(img_loop));
 end
@@ -167,8 +167,8 @@ Features = FFeatures(startFeatures:endFeatures,:);
 CheckTextGroup = zeros(1,6);
 CheckisStable = zeros(1,11);
 BoundingBoxes = GetBoundingBoxes(CCs,CCstats,Features,true,hasParametersSupplied,parameters);
-%  CheckisStable
-%  CheckTextGroup
+%disp(CheckisStable);
+%disp(CheckTextGroup);
 
 end
 
@@ -185,23 +185,32 @@ end
 function [accuracy] = overlapAccuracy(textBoxes, currentfilename)
 global img list gtBoundingbox;
 [row,col] = size(img);
-
+% disp(size(img));
 mask = zeros(row,col);
+mask2 = zeros(row,col);
+% size(mask2)
 textBoxes = uint16(textBoxes);
 % mark the GT in mask
 for i = 1:size(gtBoundingbox,2)
     if strcmp(gtBoundingbox{i},currentfilename)
-        mask(list(i,1):list(i,1)+list(i,3)-1,list(i,2):list(i,2)+list(i,4)-1) = 1;
+        mask(list(i,2):list(i,2)+list(i,4)-1,list(i,1):list(i,1)+list(i,3)-1) = 1;
     end
 end
 % mark output in mask
+% may have put x ad y wrong, check it
+% fprintf('groud truth only - %d\n',sum(mask(:)==1));
 for i =1:size(textBoxes,1)
     xmin = max(textBoxes(i,1),1);
-    xmax = min(textBoxes(i,1)+textBoxes(i,3)-1,row);
+    xmax = min(textBoxes(i,1)+textBoxes(i,3)-1,col);
     ymin = max(textBoxes(i,2),1);
-    ymax = min(textBoxes(i,2)+textBoxes(i,4)-1,col);
-    mask(xmin:xmax,ymin:ymax) = mask(xmin:xmax,ymin:ymax) + 2;
+    ymax = min(textBoxes(i,2)+textBoxes(i,4)-1,row);
+    mask2(ymin:ymax, xmin:xmax) = 2;
+    % fprintf('text box at - (%d, %d) to (%d, %d)\n',xmin,ymin,xmax,ymax);
+    % disp(size(mask2));
 end
+% disp(size(mask));
+% disp(size(mask2));
+mask = mask + mask2;
 fprintf('textBox only - %d : intersection - %d : union - %d\n',sum(mask(:)==2),sum(mask(:)==3),sum(mask(:)~=0));
 accuracy = sum(mask(:)==3)/(sum(mask(:)~=0));
 end
