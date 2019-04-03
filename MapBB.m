@@ -1,5 +1,7 @@
 function MapBB(CCs,CCstats,Features,NeedToStabilize,hasParametersSupplied,Parameters)
-global ShowOutput;
+global ShowOutput CheckTextGroup CountStables;
+
+CountStables = 0;
 
 [row,col,~] = size(ShowOutput);
 BoundingBoxes = zeros(1,4);
@@ -131,7 +133,7 @@ for i = 1:size(CCs,2)
                 component_class(comp,1) = 3;
             end
         end % Stabilization done
-        
+        CountStables = CountStables + 1;
         
         stats = CCstats(comp,:);
         
@@ -170,9 +172,9 @@ for i = 1:size(CCs,2)
             
             scan_stats = CCstats(scan_comp,:);
             spacing_dev = abs(scan_stats(1,1) - max_y)/avg_height;
-            if spacing_dev > 1.25*GroupingParams(1,2) % CRITICAL ASSUME: Once components reach a certain distance horizontally,it keeps on increasing
-                break;
-            end
+%             if spacing_dev > 1.25*GroupingParams(1,2) % CRITICAL ASSUME: Once components reach a certain distance horizontally,it keeps on increasing
+%                 break;
+%             end
             baseline_dev = abs(scan_stats(1,2) + scan_stats(1,4) - avg_baseline)/avg_height;
             height_dev =  abs(scan_stats(1,4) - avg_height)/avg_height;
             startPoint_diff = (max_y - scan_stats(1,1))/avg_height;
@@ -227,7 +229,7 @@ for i = 1:size(CCs,2)
         else
             component_class(aligned_comps,1) = 1;
         end
-%         
+         CheckTextGroup = CheckTextGroup + isTextGroup;  
     end
     start = ends + 1;
 end

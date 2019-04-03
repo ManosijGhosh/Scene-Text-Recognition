@@ -10,13 +10,13 @@ tic
 %clc
 rng('shuffle');
 functionNum = 1;
-scale = 100;
+scale = 1;
 % these need variables to be changed for each function, refer to the tables in the paper
-ubArray=ones(1,1)*scale;
+ubArray=ones(1,1);
 lbArray=zeros(1,1);
 dimArray=39;
-ub=ubArray(functionNum);
-lb=lbArray(functionNum);
+ub=3;
+lb=0;
 dimension=dimArray(functionNum);
 
 % variables requiring change ends

@@ -83,10 +83,10 @@ if hasParametersSupplied
     GroupingParams = Parameters(1,16:19); % PARAMETER ARRAY DEPENDENT
     AlignedGroupParams_MAX = [Parameters(1,20:2:26) Parameters(1,28:29)];
     AlignedGroupParams_MIN = [Parameters(1,21:2:27) 0 0];
-%     AlignedGroupParams_MAX  =  AlignedGroupParams_MAX +  AlignedGroupParams_MIN;
+     AlignedGroupParams_MAX  =  AlignedGroupParams_MAX +  AlignedGroupParams_MIN;
     NonAlignedGroupParams_MAX = [Parameters(1,30:2:36) Parameters(1,38:39)];
     NonAlignedGroupParams_MIN = [Parameters(1,31:2:37) 0 0];
-%     NonAlignedGroupParams_MAX = NonAlignedGroupParams_MAX + NonAlignedGroupParams_MIN;
+     NonAlignedGroupParams_MAX = NonAlignedGroupParams_MAX + NonAlignedGroupParams_MIN;
 else                                     % DEFAULT VALUES
     GroupingParams = [ 0.25 0.25 0.25 0.25 ];
     AlignedGroupParams_MAX = [ 0.8 0.06 0.98 0.9 0.25 0.3];
@@ -171,9 +171,9 @@ for i = 1:size(CCs,2)
             
             scan_stats = CCstats(scan_comp,:);
             spacing_dev = abs(scan_stats(1,1) - max_y)/avg_height;
-            if spacing_dev > 1.25*GroupingParams(1,2) % CRITICAL ASSUME: Once components reach a certain distance horizontally,it keeps on increasing
-                break;
-            end
+%             if spacing_dev > 1.25*GroupingParams(1,2) % CRITICAL ASSUME: Once components reach a certain distance horizontally,it keeps on increasing
+%                 break;
+%             end
             baseline_dev = abs(scan_stats(1,2) + scan_stats(1,4) - avg_baseline)/avg_height;
             height_dev =  abs(scan_stats(1,4) - avg_height)/avg_height;
             startPoint_diff = (max_y - scan_stats(1,1))/avg_height;

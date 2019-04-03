@@ -1,5 +1,9 @@
 function viewWorking(isImageBinned,isImageCombined,image_no,ShowOutput_dir,file_ext)
-global BinImages ShowOutput FCCs FCCs_indexes FCCstats FCCstats_indexes FFeatures FFeatures_indexes ExtractedFileNames
+global BinImages ShowOutput CheckisStable CheckTextGroup CountStables;
+
+CheckisStable = zeros(1,11);
+CheckTextGroup = zeros(1,6);
+
 folderPath='with GT/';
 %folderPath = 'E:\ResearchFiles\DATA\test_input\'; % Path on Indra's Machine only
 idir = dir(strcat(folderPath,'i (*).jpg'));
@@ -54,7 +58,7 @@ end
         
 
 % 
-% fprintf(".....Combining and removing components....\n");
+ fprintf(".....Combining and removing components....\n");
 % 
 if ~isImageCombined
     q_offset = 0;
@@ -86,7 +90,8 @@ load('viewWorkingFeatures.mat','Features')
 load('viewWorkingCCstats.mat','CCstats')
 load('viewWorkingCCs.mat','CCs') 
 
-
+ Features(:,[3 4 11]) = Features(:,[3 4 11])./1000;
+ Features = abs(Features);
 % img_no = image_no;
 % hasParametersSupplied = true;
 % 
@@ -104,10 +109,16 @@ load('viewWorkingCCs.mat','CCs')
 % Features = FFeatures(startFeatures:endFeatures,:);
 
 hasParametersSupplied = true;
-parameters = [1 1 1 1 1 1 0 1 1 1 0 1 0 1 0 1 1 1 1 1 0 1 0 1 0 1 0 1 1 1 0 1 0 1 0 1 0 1 1];
-parameters(1,16:19) = 2;
+parameters = [ 1 1 1 1 1 1 0 1 1 1 0 1 0 1 0 1 1 1 1 1 0 1 0 1 0 1 0 1 1 1 0 1 0 1 0 1 0 1 1];
 fprintf("......Get Bounding Boxes...\n");
 MapBB(CCs,CCstats,Features,true,hasParametersSupplied,parameters);
+
+
+CheckisStable
+CountStables
+CheckTextGroup
+
+
 
 fprintf("......Printing......\n");
 NumImages = size(ShowOutput,3);
@@ -121,5 +132,7 @@ for j=(1:NumImages)
     imwrite(F_img,saveFile3,'jpg');
 
 end
+
+
 end
 
