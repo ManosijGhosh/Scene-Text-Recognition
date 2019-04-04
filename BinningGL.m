@@ -204,13 +204,23 @@ for i =1:size(textBoxes,1)
     xmax = min(textBoxes(i,1)+textBoxes(i,3)-1,col);
     ymin = max(textBoxes(i,2),1);
     ymax = min(textBoxes(i,2)+textBoxes(i,4)-1,row);
-    mask2(ymin:ymax, xmin:xmax) = 2;
+    
+    %INDRA's modification
+    mask2(ymin:ymax, xmin:xmax) = mask2(ymin:ymax, xmin:xmax)+2;
     % fprintf('text box at - (%d, %d) to (%d, %d)\n',xmin,ymin,xmax,ymax);
     % disp(size(mask2));
 end
 % disp(size(mask));
 % disp(size(mask2));
+
+
+
 mask = mask + mask2;
-fprintf('textBox only - %d : intersection - %d : union - %d\n',sum(mask(:)==2),sum(mask(:)==3),sum(mask(:)~=0));
-accuracy = sum(mask(:)==3)/(sum(mask(:)~=0));
+textBoxOnly = sum(sum(mask(mask ~= 0 & mod(mask,2) ~= 1)./2));
+intersection = sum(sum((mask(mod(mask,2) == 1)-1)./2));
+union = textBoxOnly + intersection + sum(sum(mask == 1));
+fprintf('textBox only - %d : intersection - %d : union - %d\n',textBoxOnly,intersection,union);
+%fprintf('textBox only - %d : intersection - %d : union - %d\n',sum(mask(:)==2),sum(mask(:)==3),sum(mask(:)~=0));
+%accuracy = sum(mask(:)==3)/(sum(mask(:)~=0));
+accuracy = intersection/union;
 end
