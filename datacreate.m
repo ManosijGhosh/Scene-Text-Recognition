@@ -30,5 +30,5 @@ end
 % % data(:,16:19) = 0.25;
 % data = max(data,lb);
 % data = min(data,ub);
-%data=data*scale;
+data=data*scale;
 end

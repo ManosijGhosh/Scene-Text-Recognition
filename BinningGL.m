@@ -3,7 +3,7 @@ global img ExtractionDone BinNumber FCCs FCCs_indexes FCCstats FCCstats_indexes 
 folderPath='with GT/';
 %folderPath = 'E:\ResearchFiles\DATA\Scene-Text-Recognition-GIAN\with GT\'; % Path on Indra's Machine only
 idir = dir(strcat(folderPath,'i (*).jpg'));
-nfiles = 4;
+nfiles = 10;
 accuracy = zeros(1,nfiles);
 
 initialiseGT();
@@ -133,9 +133,9 @@ for img_loop=1:nfiles
     textBoxes = boundingBoxes(chromosome,img_loop);
     %disp(textBoxes);
     accuracy(img_loop) = overlapAccuracy(textBoxes, currentfilename);
-    fprintf('Accuracy ratio - %f\n',accuracy(img_loop));
+    %fprintf('Accuracy ratio - %f\n',accuracy(img_loop));
 end
-disp(accuracy);
+%disp(accuracy);
 fitness = mean(accuracy);
 end
 
@@ -219,7 +219,7 @@ mask = mask + mask2;
 textBoxOnly = sum(sum(mask(mask ~= 0 & mod(mask,2) ~= 1)./2));
 intersection = sum(sum((mask(mod(mask,2) == 1)-1)./2));
 union = textBoxOnly + intersection + sum(sum(mask == 1));
-fprintf('textBox only - %d : intersection - %d : union - %d\n',textBoxOnly,intersection,union);
+%fprintf('textBox only - %d : intersection - %d : union - %d\n',textBoxOnly,intersection,union);
 %fprintf('textBox only - %d : intersection - %d : union - %d\n',sum(mask(:)==2),sum(mask(:)==3),sum(mask(:)~=0));
 %accuracy = sum(mask(:)==3)/(sum(mask(:)~=0));
 accuracy = intersection/union;

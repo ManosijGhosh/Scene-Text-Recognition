@@ -10,18 +10,18 @@ tic
 %clc
 rng('shuffle');
 functionNum = 1;
-scale = 1;
+scale = 100;
 % these need variables to be changed for each function, refer to the tables in the paper
-ubArray=ones(1,1);
+ubArray=ones(1,1)*scale;
 lbArray=zeros(1,1);
 dimArray=39;
-ub=3;
+ub=3*scale;
 lb=0;
 dimension=dimArray(functionNum);
 
 % variables requiring change ends
-n=50;   %number of points being considered
-iter=1000;
+n=10;   %number of points being considered
+iter=15;
 
 label=zeros(1,iter);
 valuesBest=zeros(1,iter);
@@ -47,7 +47,7 @@ change=0;
 
 
 for count=1:iter
-    %fprintf('Iteration - %d with gbest as - %f and current best %f change  - %f\n',count,double(gbest_rank),double(rank(1)),change);
+    fprintf('Iteration - %d with gbest as - %f and current best %f\n',count,double(gbest_rank),double(rank(1)));
     
     valuesBest(1,count)=rank(1);
     valuesAvg(1,count)=sum(rank)/n;
@@ -83,7 +83,7 @@ for count=1:iter
     else
         change=0;
     end
-    disp(population);
+    %disp(population);
     %{
     [population]=mutation(population,rank,count,iter,change,(ub-lb));
     [population,rank,velocities_gsa,velocities_pso,pbest,pbest_particle]=chromosomeRank(population,rank,velocities_gsa,velocities_pso,pbest,pbest_particle,scale,1,0);

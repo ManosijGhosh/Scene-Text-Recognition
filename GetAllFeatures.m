@@ -49,11 +49,11 @@ lower_range_check_imgs = false(row,col,NUM_BIN_IMAGES);
 upper_range_check_imgs = false(row,col,NUM_BIN_IMAGES);
 lower_range_bwimages = zeros(row,col,NUM_BIN_IMAGES);
 upper_range_bwimages = zeros(row,col,NUM_BIN_IMAGES);
-fprintf(".......preprocessing......... Non PARALLEL\n");
+fprintf(".......preprocessing.........\n");
 q_offset = 0;
 for i = 1:numel(BinSizes)
     main_offset = ceil(MAX_DISTANCE/BinSizes(i));
-    for img_no = (q_offset+1):(q_offset+main_offset)
+    parfor img_no = (q_offset+1):(q_offset+main_offset)
         
         if img_no ~= (q_offset+main_offset)
             scan_imgs(:,:,img_no) = ReduceToMainCCs(logical(BinImages(:,:,img_no)+BinImages(:,:,(img_no+main_offset))));
@@ -99,7 +99,7 @@ for i = 1:numel(BinSizes)
         upper_range_bwimages(:,:,img_no) = bwlabel(upper_range_check_imgs(:,:,img_no));
     end
     
-    for img_no = (q_offset+main_offset+1):(q_offset+2*main_offset-1)
+    parfor img_no = (q_offset+main_offset+1):(q_offset+2*main_offset-1)
         
         scan_imgs(:,:,img_no) = ReduceToMainCCs(logical(BinImages(:,:,img_no)+BinImages(:,:,(img_no-main_offset+1))));
         
