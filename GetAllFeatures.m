@@ -1,6 +1,6 @@
 function [PageEndings,statsBoxes,Features,FinalBinImages] = GetAllFeatures(BinSizes,MAX_DISTANCE,StabilityCheckMatrix,getFinalBinImages) % Make 2nd one false for speed
 
-global BinImages ShowOutput
+global BinImages %ShowOutput
 %% Features Extracted
 
 % 1. Lower Range Pixel Deviatiion ([0,Inf])
@@ -463,8 +463,8 @@ for i = 1:numel(BinSizes) %Must change Loop for change in Bin
     
     q_offset = q_offset+2*main_offset-1;
 end
-fprintf("..To be removed...\n");
-PageEndings
-
-ShowOutput(:,:,1:2:end) = scan_imgs;
+% fprintf("..To be removed...\n");
+% PageEndings
+% 
+% ShowOutput(:,:,1:2:end) = scan_imgs;
 end

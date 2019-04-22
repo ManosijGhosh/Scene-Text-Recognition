@@ -10,18 +10,18 @@ tic
 %clc
 rng('shuffle');
 functionNum = 1;
-scale = 100;
+scale = 1;
 % these need variables to be changed for each function, refer to the tables in the paper
 ubArray=ones(1,1)*scale;
 lbArray=zeros(1,1);
 dimArray=39;
-ub=3*scale;
-lb=0;
+ub=3*ubArray;
+lb=lbArray;
 dimension=dimArray(functionNum);
 
 % variables requiring change ends
-n=10;   %number of points being considered
-iter=15;
+n=50;   %number of points being considered
+iter=50;
 
 label=zeros(1,iter);
 valuesBest=zeros(1,iter);
