@@ -1,7 +1,7 @@
 function [timeexc,gbest_rank]=gps()
 
 %% Indra's Code
-global ExtractionDone;
+global ExtractionDone 
 ExtractionDone = false;
 
 %%
@@ -10,17 +10,18 @@ tic
 %clc
 rng('shuffle');
 functionNum = 1;
+scale = 1;
 % these need variables to be changed for each function, refer to the tables in the paper
-ubArray=ones(1,1);
+ubArray=ones(1,1)*scale;
 lbArray=zeros(1,1);
 dimArray=39;
-ub=ubArray(functionNum);
-lb=lbArray(functionNum);
+ub=3*ubArray;
+lb=lbArray;
 dimension=dimArray(functionNum);
 
 % variables requiring change ends
-n=5;   %number of points being considered
-iter=2;
+n=50;   %number of points being considered
+iter=50;
 
 label=zeros(1,iter);
 valuesBest=zeros(1,iter);
@@ -30,14 +31,14 @@ valuesAvg=zeros(1,iter);
     rank=vpa(zeros(1,n));
     velocities=vpa(zeros(n,dimension));
 %}
-population=(datacreate(n,dimension,lb,ub));
+population = datacreate(n,dimension,scale,lb,ub);
 rank=(zeros(1,n));
 velocities_gsa=(zeros(n,dimension));
 velocities_pso=zeros(n,dimension);
 pbest=rank;
 pbest_particle=population;
 
-[population,rank,velocities_gsa,velocities_pso,~,pbest_particle]=chromosomeRank(population,rank,velocities_gsa,velocities_pso,pbest,pbest_particle,1,1);
+[population,rank,velocities_gsa,velocities_pso,~,pbest_particle]=chromosomeRank(population,rank,velocities_gsa,velocities_pso,pbest,pbest_particle,scale,1,1);
 gbest_rank=rank(1);
 gbest_particle=population(1,:);
 pbest=rank;
@@ -46,7 +47,7 @@ change=0;
 
 
 for count=1:iter
-    %fprintf('Iteration - %d with gbest as - %f and current best %f change  - %f\n',count,double(gbest_rank),double(rank(1)),change);
+    fprintf('Iteration - %d with gbest as - %f and current best %f\n',count,double(gbest_rank),double(rank(1)));
     
     valuesBest(1,count)=rank(1);
     valuesAvg(1,count)=sum(rank)/n;
@@ -61,9 +62,9 @@ for count=1:iter
     
     population=min(population,ub);
     population=max(population,lb);
-    [population,rank,velocities_gsa,velocities_pso,pbest,pbest_particle]=chromosomeRank(population,rank,velocities_gsa,velocities_pso,pbest,pbest_particle,1,0);
+    [population,rank,velocities_gsa,velocities_pso,pbest,pbest_particle]=chromosomeRank(population,rank,velocities_gsa,velocities_pso,pbest,pbest_particle,scale,1,1);
     
-    if (gbest_rank>=rank(1))
+    if (gbest_rank<=rank(1))
         gbest_rank=rank(1);
         gbest_particle=population(1,:);
     end
@@ -82,10 +83,10 @@ for count=1:iter
     else
         change=0;
     end
-    
-    %%{
+    %disp(population);
+    %{
     [population]=mutation(population,rank,count,iter,change,(ub-lb));
-    [population,rank,velocities_gsa,velocities_pso,pbest,pbest_particle]=chromosomeRank(population,rank,velocities_gsa,velocities_pso,pbest,pbest_particle,1,0);
+    [population,rank,velocities_gsa,velocities_pso,pbest,pbest_particle]=chromosomeRank(population,rank,velocities_gsa,velocities_pso,pbest,pbest_particle,scale,1,0);
     if (gbest_rank>=rank(1))
         gbest_rank=rank(1);
         gbest_particle=population(1,:);

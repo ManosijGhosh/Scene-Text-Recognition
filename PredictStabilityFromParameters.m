@@ -1,5 +1,6 @@
 function [isStable] = PredictStabilityFromParameters(Features,Parameters)
-
+  global CheckisStable
+  
    %% PARAMETERS
     % 1.  Max Lower Range No. of Pixels Deviation Allowed ( Value > 0 and Value < 1 )
     % 2.  Max Higher Range No. of Pixels Deviation Allowed ( Value > 0 and Value < 1)
@@ -32,10 +33,12 @@ function [isStable] = PredictStabilityFromParameters(Features,Parameters)
    % 11. Euler [0,1)
    
    %% CODE
-  MAX_Params = Parameters(1,[1 2 4 5 8 9 10 12 14 6 3]);
+ 
   MIN_Params = [0 0 0 0 0 0 Parameters(1,[11 13 15 7]) 0];
-  
-  IsStable = (Features <= MAX_Params) & (Features>= MIN_Params); 
+   MAX_Params = Parameters(1,[1 2 4 5 8 9 10 12 14 6 3]);
+%    Features(1,[3,4,11]) =  0;
+  IsStable = (Features <= MAX_Params) & (Features>= MIN_Params);
+  CheckisStable = CheckisStable + IsStable;
      if IsStable == 1
          isStable = true;
      else
